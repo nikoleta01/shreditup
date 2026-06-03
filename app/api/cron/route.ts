@@ -1,0 +1,59 @@
+import { NextResponse } from 'next/server'
+import webpush from 'web-push'
+import { getSupabase } from '@/lib/supabase'
+import { performances, FESTIVAL_DAYS } from '@/lib/data'
+
+webpush.setVapidDetails(
+  'mailto:shreditup@leveltrevel.sk',
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
+)
+
+export async function GET(req: Request) {
+  if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const now = new Date()
+  const targetTime = new Date(now.getTime() + 15 * 60 * 1000)
+
+  const upcoming = performances.filter((p) => {
+    const festDay = FESTIVAL_DAYS[p.day].date
+    const [h, m] = p.startTime.split(':').map(Number)
+    const perfDate = new Date(festDay)
+    perfDate.setHours(h, m, 0, 0)
+
+    const diffMs = perfDate.getTime() - now.getTime()
+    return diffMs > 0 && diffMs <= 16 * 60 * 1000 && diffMs > 14 * 60 * 1000
+  })
+
+  if (upcoming.length === 0) {
+    return NextResponse.json({ sent: 0 })
+  }
+
+  const { data: subs } = await getSupabase().from('push_subscriptions').select('*')
+  if (!subs || subs.length === 0) return NextResponse.json({ sent: 0 })
+
+  let sent = 0
+
+  for (const perf of upcoming) {
+    const payload = JSON.stringify({
+      title: `O 15 minút začína: ${perf.artist}`,
+      body: `${perf.startTime} · Main Stage`,
+      url: '/program',
+    })
+
+    await Promise.allSettled(
+      subs.map((sub) =>
+        webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          payload
+        )
+      )
+    )
+
+    sent++
+  }
+
+  return NextResponse.json({ sent, performances: upcoming.map((p) => p.artist) })
+}
