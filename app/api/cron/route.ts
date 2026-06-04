@@ -3,12 +3,6 @@ import webpush from 'web-push'
 import { getSupabase } from '@/lib/supabase'
 import { performances, FESTIVAL_DAYS } from '@/lib/data'
 
-webpush.setVapidDetails(
-  'mailto:shreditup@leveltrevel.sk',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
-
 export async function GET(req: Request) {
   if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -26,6 +20,12 @@ export async function GET(req: Request) {
     const diffMs = perfDate.getTime() - now.getTime()
     return diffMs > 0 && diffMs <= 16 * 60 * 1000 && diffMs > 14 * 60 * 1000
   })
+
+  webpush.setVapidDetails(
+    'mailto:shreditup@leveltrevel.sk',
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  )
 
   if (upcoming.length === 0) {
     return NextResponse.json({ sent: 0 })
