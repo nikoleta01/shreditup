@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Bell, BellOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useLang } from '@/components/language-provider'
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
@@ -14,6 +15,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function NotificationButton() {
+  const { t } = useLang()
   const [supported, setSupported] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -68,7 +70,7 @@ export function NotificationButton() {
       size="icon"
       onClick={toggle}
       disabled={loading}
-      aria-label={subscribed ? 'Vypnúť notifikácie' : 'Zapnúť notifikácie'}
+      aria-label={subscribed ? t.notifications.disable : t.notifications.enable}
       className="h-9 w-9"
     >
       {subscribed ? (

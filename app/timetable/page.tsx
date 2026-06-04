@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { FESTIVAL_DAYS, getPerformancesByDay, STAGE_NAME, type Performance } from '@/lib/data'
+import { getPerformancesByDay, type Performance } from '@/lib/data'
+import { useLang } from '@/components/language-provider'
 
-const SLOT_HEIGHT = 60 // px per hour
-const START_HOUR = 12 // timetable starts at 12:00
-const END_HOUR = 25 // 01:00 next day
+const SLOT_HEIGHT = 60
+const START_HOUR = 12
+const END_HOUR = 25
 
 function timeToMinutes(time: string) {
   const [h, m] = time.split(':').map(Number)
@@ -23,9 +24,7 @@ function totalMinutes() {
 
 function hourLabels() {
   const labels = []
-  for (let h = START_HOUR; h <= END_HOUR; h++) {
-    labels.push(h % 24)
-  }
+  for (let h = START_HOUR; h <= END_HOUR; h++) labels.push(h % 24)
   return labels
 }
 
@@ -33,7 +32,7 @@ function PerformanceBlock({ p }: { p: Performance }) {
   const top = (minutesSinceStart(p.startTime) / 60) * SLOT_HEIGHT
   const startMins = timeToMinutes(p.startTime)
   let endMins = timeToMinutes(p.endTime)
-  if (endMins < startMins) endMins += 24 * 60 // crosses midnight
+  if (endMins < startMins) endMins += 24 * 60
   const height = Math.max(((endMins - startMins) / 60) * SLOT_HEIGHT - 4, 20)
 
   return (
@@ -42,21 +41,18 @@ function PerformanceBlock({ p }: { p: Performance }) {
       style={{ top, height }}
     >
       <p className="truncate text-xs font-semibold leading-tight">{p.artist}</p>
-      <p className="truncate text-[10px] opacity-75">
-        {p.startTime}–{p.endTime}
-      </p>
+      <p className="truncate text-[10px] opacity-75">{p.startTime}–{p.endTime}</p>
     </div>
   )
 }
 
-function DayTimetable({ day }: { day: 1 | 2 | 3 }) {
+function DayTimetable({ day, stageName }: { day: 1 | 2 | 3; stageName: string }) {
   const perfs = getPerformancesByDay(day)
   const gridHeight = (totalMinutes() / 60) * SLOT_HEIGHT
   const labels = hourLabels()
 
   return (
     <div className="flex overflow-x-auto pb-4">
-      {/* Time axis */}
       <div className="relative mr-2 shrink-0" style={{ height: gridHeight }}>
         {labels.map((h, i) => (
           <div
@@ -68,14 +64,11 @@ function DayTimetable({ day }: { day: 1 | 2 | 3 }) {
           </div>
         ))}
       </div>
-
-      {/* Stage column */}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="mb-1 text-center text-xs font-medium text-muted-foreground">
-          {STAGE_NAME}
+          {stageName}
         </div>
         <div className="relative" style={{ height: gridHeight }}>
-          {/* Hour grid lines */}
           {labels.map((h, i) => (
             <div
               key={h}
@@ -83,7 +76,6 @@ function DayTimetable({ day }: { day: 1 | 2 | 3 }) {
               style={{ top: i * SLOT_HEIGHT }}
             />
           ))}
-          {/* Performances */}
           {perfs.map((p) => (
             <PerformanceBlock key={p.id} p={p} />
           ))}
@@ -94,27 +86,24 @@ function DayTimetable({ day }: { day: 1 | 2 | 3 }) {
 }
 
 export default function TimetablePage() {
+  const { t } = useLang()
   const [activeDay, setActiveDay] = useState<'1' | '2' | '3'>('1')
 
   return (
     <div className="px-4 pt-4">
       <div className="mx-auto max-w-lg">
-        <p className="mb-4 text-sm font-medium text-muted-foreground uppercase tracking-wider">
-          Harmonogram
-        </p>
-
         <Tabs value={activeDay} onValueChange={(v) => setActiveDay(v as '1' | '2' | '3')}>
           <TabsList className="mb-4 grid w-full grid-cols-3">
             {([1, 2, 3] as const).map((day) => (
               <TabsTrigger key={day} value={String(day)} className="text-xs">
-                {FESTIVAL_DAYS[day].short}
+                {t.days[day].short}
               </TabsTrigger>
             ))}
           </TabsList>
-
           {([1, 2, 3] as const).map((day) => (
             <TabsContent key={day} value={String(day)}>
-              <DayTimetable day={day} />
+              <p className="mb-3 text-sm text-muted-foreground">{t.days[day].label}</p>
+              <DayTimetable day={day} stageName={t.mainStage} />
             </TabsContent>
           ))}
         </Tabs>

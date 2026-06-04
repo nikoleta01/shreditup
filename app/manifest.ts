@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Program a harmonogram festivalu Shreditup 2026',
     start_url: '/',
     display: 'standalone',
-    background_color: '#09090b',
-    theme_color: '#09090b',
+    background_color: '#3D8DC5',
+    theme_color: '#3D8DC5',
     orientation: 'portrait',
     icons: [
       {

@@ -9,7 +9,6 @@ export async function GET(req: Request) {
   }
 
   const now = new Date()
-  const targetTime = new Date(now.getTime() + 15 * 60 * 1000)
 
   const upcoming = performances.filter((p) => {
     const festDay = FESTIVAL_DAYS[p.day].date
@@ -18,7 +17,8 @@ export async function GET(req: Request) {
     perfDate.setHours(h, m, 0, 0)
 
     const diffMs = perfDate.getTime() - now.getTime()
-    return diffMs > 0 && diffMs <= 16 * 60 * 1000 && diffMs > 14 * 60 * 1000
+    // 28–33 min window — sized for a 5-min cron, centered on 30 min before start
+    return diffMs > 28 * 60 * 1000 && diffMs <= 33 * 60 * 1000
   })
 
   webpush.setVapidDetails(
@@ -38,8 +38,8 @@ export async function GET(req: Request) {
 
   for (const perf of upcoming) {
     const payload = JSON.stringify({
-      title: `O 15 minút začína: ${perf.artist}`,
-      body: `${perf.startTime} · Main Stage`,
+      title: perf.artist,
+      body: `O 30 minút začína · Starting in 30 min · ${perf.startTime}`,
       url: '/program',
     })
 
