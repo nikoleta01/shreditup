@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { CalendarDays, List } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLang } from '@/components/language-provider'
+import { ChainBorder } from '@/components/chain-border'
 
 export function BottomNav() {
   const pathname = usePathname()
@@ -16,8 +17,9 @@ export function BottomNav() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-16 max-w-md items-center justify-around px-4">
+    <nav className="fixed bottom-0 left-0 right-0 z-50">
+      <ChainBorder flip />
+      <div className="flex h-16 items-center justify-around px-4" style={{ background: '#3D8DC5' }}>
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href)
           return (
@@ -26,10 +28,13 @@ export function BottomNav() {
               href={href}
               className={cn(
                 'flex flex-col items-center gap-1 rounded-lg px-6 py-2 text-xs font-medium transition-colors',
-                active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                active ? 'text-white' : 'text-white/50 hover:text-white/80'
               )}
             >
-              <Icon className={cn('h-5 w-5', active && 'stroke-[2.5]')} aria-hidden />
+              <Icon
+                className={cn('h-5 w-5', active && 'stroke-[2.5]')}
+                aria-hidden
+              />
               {label}
             </Link>
           )

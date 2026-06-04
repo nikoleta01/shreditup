@@ -28,13 +28,13 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#09090b',
+  themeColor: '#3D8DC5',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sk" className={geistSans.variable}>
-      <body className="flex min-h-svh flex-col bg-background text-foreground antialiased">
+    <html lang="sk" className={`${geistSans.variable} dark`}>
+      <body className="flex min-h-svh flex-col antialiased" style={{ background: '#1A0C07', color: '#F5EDD8' }}>
         <LanguageProvider>
           <Header />
           <InstallPrompt />
