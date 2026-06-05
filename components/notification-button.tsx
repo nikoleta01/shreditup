@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Bell, BellOff } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { useLang } from '@/components/language-provider'
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -65,19 +64,21 @@ export function NotificationButton() {
   if (!supported) return null
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
       onClick={toggle}
       disabled={loading}
       aria-label={subscribed ? t.notifications.disable : t.notifications.enable}
-      className="h-9 w-9"
+      className={`flex items-center justify-center rounded border-2 px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
+        subscribed
+          ? 'border-card-foreground bg-card-foreground text-card'
+          : 'border-card-foreground/40 bg-transparent text-card-foreground hover:border-card-foreground hover:bg-card-foreground hover:text-card'
+      }`}
     >
       {subscribed ? (
-        <Bell className="h-5 w-5 fill-current" />
+        <Bell className="h-4 w-4 fill-current" aria-hidden />
       ) : (
-        <BellOff className="h-5 w-5" />
+        <BellOff className="h-4 w-4" aria-hidden />
       )}
-    </Button>
+    </button>
   )
 }

@@ -18,8 +18,9 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
+      {/* Wave border: background (orange) → card (blue) */}
       <ChainBorder flip />
-      <div className="flex h-16 items-center justify-around px-4" style={{ background: '#3D8DC5' }}>
+      <div className="flex h-16 items-center justify-around bg-card px-4">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href)
           return (
@@ -27,15 +28,18 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex flex-col items-center gap-1 rounded-lg px-6 py-2 text-xs font-medium transition-colors',
-                active ? 'text-white' : 'text-white/50 hover:text-white/80'
+                'flex flex-col items-center gap-1 rounded-lg px-6 py-2 transition-colors',
+                active
+                  ? 'text-card-foreground'
+                  : 'text-card-foreground/50 hover:text-card-foreground/80'
               )}
+              style={{ fontFamily: 'var(--font-barlow-condensed)' }}
             >
               <Icon
                 className={cn('h-5 w-5', active && 'stroke-[2.5]')}
                 aria-hidden
               />
-              {label}
+              <span className="text-xs font-semibold">{label}</span>
             </Link>
           )
         })}

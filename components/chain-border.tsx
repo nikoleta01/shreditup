@@ -31,11 +31,12 @@ export function ChainBorder({ flip = false }: { flip?: boolean }) {
       preserveAspectRatio="xMinYMid slice"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
-      style={flip ? { transform: 'scaleY(-1)' } : undefined}
+      style={flip ? { transform: 'scaleY(-1)', display: 'block' } : { display: 'block' }}
     >
-      <path d={topFill} fill="#3D8DC5" />
-      <path d={botFill} fill="#7D7D2E" />
-      <path d={waveLine} fill="none" stroke="#1A0C07" strokeWidth={1.5} />
+      {/* top fill = card (blue), bottom fill = background (orange), or inverse when flipped */}
+      <path d={topFill} style={{ fill: 'var(--card)' }} />
+      <path d={botFill} style={{ fill: 'var(--background)' }} />
+      <path d={waveLine} fill="none" style={{ stroke: 'var(--foreground)' }} strokeWidth={1.5} />
     </svg>
   )
 }

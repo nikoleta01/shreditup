@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { X, Share, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { useLang } from '@/components/language-provider'
 
 type InstallState = 'hidden' | 'android' | 'ios'
@@ -44,31 +43,39 @@ export function InstallPrompt() {
   if (state === 'hidden') return null
 
   return (
-    <div className="mx-4 mt-3 flex items-start gap-3 rounded-xl border border-border bg-card p-3 shadow-sm">
-      <div className="flex-1 space-y-1">
+    <div className="mx-4 mt-3 flex items-start gap-3 border-2 border-foreground bg-card p-3">
+      <div className="flex-1 space-y-1.5">
+        <p
+          className="text-sm font-bold text-card-foreground"
+          style={{ fontFamily: 'var(--font-barlow-condensed)' }}
+        >
+          {t.install.title}
+        </p>
+
         {state === 'android' ? (
           <>
-            <p className="text-sm font-medium">{t.install.title}</p>
-            <p className="text-xs text-muted-foreground">{t.install.desc}</p>
-            <Button size="sm" className="mt-2 h-8 text-xs" onClick={installAndroid}>
-              <Plus className="mr-1 h-3.5 w-3.5" />
+            <p className="text-xs text-card-foreground/70">{t.install.desc}</p>
+            <button
+              onClick={installAndroid}
+              className="mt-1 flex items-center gap-1.5 rounded-sm border-2 border-card-foreground bg-card-foreground px-3 py-1.5 text-xs font-bold text-card transition-opacity hover:opacity-80"
+              style={{ fontFamily: 'var(--font-barlow-condensed)' }}
+            >
+              <Plus className="h-3.5 w-3.5" aria-hidden />
               {t.install.button}
-            </Button>
+            </button>
           </>
         ) : (
-          <>
-            <p className="text-sm font-medium">{t.install.title}</p>
-            <p className="text-xs text-muted-foreground">
-              {t.install.iosHint}{' '}
-              <Share className="inline h-3.5 w-3.5 align-text-bottom" />{' '}
-              {t.install.iosThen}
-            </p>
-          </>
+          <p className="text-xs text-card-foreground/70">
+            {t.install.iosHint}{' '}
+            <Share className="inline h-3.5 w-3.5 align-text-bottom" aria-hidden />{' '}
+            {t.install.iosThen}
+          </p>
         )}
       </div>
+
       <button
         onClick={dismiss}
-        className="shrink-0 rounded-full p-1 text-muted-foreground hover:text-foreground"
+        className="shrink-0 rounded p-1 text-card-foreground/60 hover:text-card-foreground"
         aria-label={t.install.close}
       >
         <X className="h-4 w-4" />
