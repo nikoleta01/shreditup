@@ -35,10 +35,10 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: FESTIVAL_NAME,
-    startupImage: '/icon-512.png',
   },
   icons: {
-    apple: '/apple-touch-icon.png',
+    icon: '/icon-512.png',
+    apple: '/icon-512.png',
   },
 }
 

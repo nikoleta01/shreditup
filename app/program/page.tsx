@@ -62,8 +62,8 @@ export default function ProgramPage() {
           <Image
             src="/dino_black.svg"
             alt="Level Trevel"
-            width={48}
-            height={28}
+            width={32}
+            height={19}
             aria-hidden
           />
           <span className="text-sm text-foreground/40 select-none">×</span>
