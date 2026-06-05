@@ -17,7 +17,6 @@ export function NotificationButton() {
   const { t } = useLang()
   const [supported, setSupported] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -30,10 +29,11 @@ export function NotificationButton() {
   }, [])
 
   async function toggle() {
-    setLoading(true)
+    const next = !subscribed
+    setSubscribed(next)
     try {
       const reg = await navigator.serviceWorker.ready
-      if (subscribed) {
+      if (!next) {
         const sub = await reg.pushManager.getSubscription()
         await sub?.unsubscribe()
         await fetch('/api/push/unsubscribe', {
@@ -41,7 +41,6 @@ export function NotificationButton() {
           body: JSON.stringify({ endpoint: sub?.endpoint }),
           headers: { 'Content-Type': 'application/json' },
         })
-        setSubscribed(false)
       } else {
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
@@ -54,10 +53,9 @@ export function NotificationButton() {
           body: JSON.stringify(JSON.parse(JSON.stringify(sub))),
           headers: { 'Content-Type': 'application/json' },
         })
-        setSubscribed(true)
       }
-    } finally {
-      setLoading(false)
+    } catch {
+      setSubscribed(!next)
     }
   }
 
@@ -66,13 +64,9 @@ export function NotificationButton() {
   return (
     <button
       onClick={toggle}
-      disabled={loading}
+
       aria-label={subscribed ? t.notifications.disable : t.notifications.enable}
-      className={`flex items-center justify-center rounded border-2 px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
-        subscribed
-          ? 'border-card-foreground bg-card-foreground text-card'
-          : 'border-card-foreground/40 bg-transparent text-card-foreground hover:border-card-foreground hover:bg-card-foreground hover:text-card'
-      }`}
+      className="inline-flex items-center justify-center rounded border-2 border-foreground bg-foreground px-2 py-0.5 text-background transition-colors hover:bg-transparent hover:text-foreground"
     >
       {subscribed ? (
         <Bell className="h-4 w-4 fill-current" aria-hidden />
