@@ -17,6 +17,8 @@ export const translations = {
       button: 'Nainštalovať',
       iosHint: 'Klepni na',
       iosThen: 'Zdieľať, potom "Pridať na plochu".',
+      iosChromeHint: 'Klepni na',
+      iosChromeThen: '••• dole vpravo, potom "Pridať na plochu".',
       close: 'Zavrieť',
     },
     notifications: {
@@ -42,6 +44,8 @@ export const translations = {
       button: 'Install',
       iosHint: 'Tap the',
       iosThen: 'Share button, then "Add to Home Screen".',
+      iosChromeHint: 'Tap',
+      iosChromeThen: '••• (bottom right), then "Add to Home Screen".',
       close: 'Close',
     },
     notifications: {
