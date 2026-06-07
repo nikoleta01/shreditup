@@ -66,12 +66,12 @@ export function NotificationButton() {
       onClick={toggle}
 
       aria-label={subscribed ? t.notifications.disable : t.notifications.enable}
-      className="inline-flex items-center justify-center rounded border-2 border-foreground bg-foreground px-2 py-0.5 text-background transition-colors hover:bg-transparent hover:text-foreground"
+      className="inline-flex h-7 w-7 items-center justify-center rounded border-2 border-foreground bg-foreground text-background transition-colors hover:bg-transparent hover:text-foreground"
     >
       {subscribed ? (
-        <Bell className="h-4 w-4 fill-current" aria-hidden />
+        <Bell className="h-[14px] w-[14px] fill-current" aria-hidden />
       ) : (
-        <BellOff className="h-4 w-4" aria-hidden />
+        <BellOff className="h-[14px] w-[14px]" aria-hidden />
       )}
     </button>
   )

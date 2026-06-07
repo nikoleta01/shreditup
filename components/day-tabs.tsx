@@ -11,12 +11,12 @@ export function DayTabs({ activeDay, onChange }: DayTabsProps) {
   const { t } = useLang();
 
   return (
-    <div className="grid grid-cols-3 gap-1 rounded border-2 border-foreground bg-card p-1">
+    <div className="grid grid-cols-3 gap-1 border-2 border-foreground bg-card p-1">
       {([1, 2, 3] as const).map((day) => (
         <button
           key={day}
           onClick={() => onChange(day)}
-          className="relative rounded py-1.5 text-xs font-bold transition-all"
+          className="relative py-1.5 text-xs font-bold transition-all"
           style={{
             fontFamily: "var(--font-barlow-condensed)",
             color: "var(--card-foreground)",
@@ -28,7 +28,7 @@ export function DayTabs({ activeDay, onChange }: DayTabsProps) {
           {activeDay === day && (
             <span
               aria-hidden
-              className="absolute inset-x-0 rounded"
+              className="absolute inset-x-0"
               style={{
                 height: "39px",
                 top: "50%",
