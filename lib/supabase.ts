@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 export type PushSubscriptionRow = {
   id: string
@@ -9,8 +9,19 @@ export type PushSubscriptionRow = {
 }
 
 export function getSupabase() {
-  return createClient(
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
+}
+
+export async function ensureAnonymousSession() {
+  const supabase = getSupabase()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) {
+    const { data, error } = await supabase.auth.signInAnonymously()
+    console.log('[supabase] signInAnonymously result:', data, error)
+    if (error) throw error
+  }
+  return supabase
 }

@@ -23,6 +23,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (stored === 'sk' || stored === 'en') setLangState(stored)
   }, [])
 
+
   function setLang(l: Lang) {
     setLangState(l)
     localStorage.setItem('lang', l)

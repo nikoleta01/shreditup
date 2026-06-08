@@ -42,10 +42,10 @@
 /* ── Poster palette — light (orange-drenched) ── */
 :root {
   /* brand colors */
-  --orange:  oklch(0.60 0.19 32);
+  --orange:  #da452c;
   --blue:    oklch(0.58 0.13 231);
   --pink:    oklch(0.70 0.12 352);
-  --olive:   oklch(0.56 0.09 107);
+  --olive:   #7b7834;
   --ink:     oklch(0.19 0.04 42);
 
   /* semantic tokens */
@@ -59,7 +59,7 @@
   --primary-foreground:  var(--ink);
   --secondary:           var(--pink);
   --secondary-foreground: var(--ink);
-  --muted:               oklch(0.54 0.16 32);
+  --muted:              oklch(0.54 0.16 32);
   --muted-foreground:    oklch(0.35 0.05 42);
   --accent:              var(--pink);
   --accent-foreground:   var(--ink);

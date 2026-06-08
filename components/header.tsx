@@ -11,7 +11,6 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40">
       <div className="flex flex-col bg-card px-4 pt-2 pb-1.5">
-        {/* Top row: festival name | controls */}
         <div className="flex items-center justify-between">
           <span
             className="text-xl leading-none text-card-foreground"
@@ -29,7 +28,7 @@ export function Header() {
             </span>
             <button
               onClick={() => setLang(lang === "sk" ? "en" : "sk")}
-              className="rounded border-2 border-card-foreground/40 px-1.5 py-0.5 text-xs font-bold text-card-foreground transition-colors hover:border-card-foreground hover:bg-card-foreground hover:text-card"
+              className="inline-flex h-7 w-7 items-center justify-center rounded border-2 border-foreground bg-foreground text-sm font-bold text-background transition-colors hover:bg-transparent hover:text-foreground"
               style={{ fontFamily: "var(--font-barlow-condensed)" }}
               aria-label="Switch language"
             >
@@ -40,7 +39,6 @@ export function Header() {
         </div>
       </div>
 
-      {/* Wave border: card (blue) → background (orange) */}
       <ChainBorder />
     </header>
   );

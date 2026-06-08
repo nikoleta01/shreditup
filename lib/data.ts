@@ -6,6 +6,7 @@ export type Performance = {
   endTime: string;
   genre: string;
   description?: string;
+  activityId?: string; // Supabase activities.id — only set for registerable items
 };
 
 export const FESTIVAL_NAME = "Shreditup";
@@ -73,19 +74,20 @@ export const performances: Performance[] = [
   // Day 2 — Saturday
   {
     id: "d2-1",
-    artist: "Meadow Sons",
+    artist: "Jóga s Jankou",
     day: 2,
-    startTime: "14:00",
-    endTime: "15:00",
-    genre: "Acoustic Folk",
+    startTime: "10:00",
+    endTime: "11:00",
+    genre: "bez registrácie",
   },
   {
     id: "d2-2",
-    artist: "Static Flora",
+    artist: "Surfskate lekcia 1",
     day: 2,
     startTime: "15:15",
     endTime: "16:30",
-    genre: "Shoegaze",
+    genre: "registrácia",
+    activityId: "bb31bcd4-f772-4834-9ba0-7d04f6e0dc05",
   },
   {
     id: "d2-3",
