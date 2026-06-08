@@ -5,7 +5,6 @@ import { BottomNav } from "@/components/bottom-nav";
 import { InstallPrompt } from "@/components/install-prompt";
 import { Header } from "@/components/header";
 import { LanguageProvider } from "@/components/language-provider";
-import { WaveSideBorder } from "@/components/wave-side-border";
 import { FESTIVAL_NAME } from "@/lib/data";
 
 const alfaSlabOne = Alfa_Slab_One({
@@ -66,8 +65,6 @@ export default function RootLayout({
     >
       <body className="flex min-h-svh flex-col bg-background text-foreground antialiased">
         <LanguageProvider>
-          <div className="hidden sm:block"><WaveSideBorder side="left" /></div>
-          <div className="hidden sm:block"><WaveSideBorder side="right" /></div>
           <Header />
           <InstallPrompt />
           <main className="flex-1 pb-20">{children}</main>

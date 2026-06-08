@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, List, ClipboardList } from 'lucide-react'
+import { CalendarDays, List, CalendarCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLang } from '@/components/language-provider'
 import { ChainBorder } from '@/components/chain-border'
@@ -14,7 +14,7 @@ export function BottomNav() {
   const links = [
     { href: '/program', label: t.program, icon: List },
     { href: '/timetable', label: t.timetable, icon: CalendarDays },
-    { href: '/registration', label: t.registration, icon: ClipboardList },
+    { href: '/registration', label: t.myActivities, icon: CalendarCheck },
   ]
 
   return (
