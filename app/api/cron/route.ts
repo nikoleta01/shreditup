@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { getSupabase } from '@/lib/supabase'
-import { performances, FESTIVAL_DAYS } from '@/lib/data'
+import { program, FESTIVAL_DAYS } from '@/lib/data'
 
 export async function GET(req: Request) {
   if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
   const now = new Date()
 
-  const upcoming = performances.filter((p) => {
+  const upcoming = program.filter((p) => {
     const festDay = FESTIVAL_DAYS[p.day].date
     const [h, m] = p.startTime.split(':').map(Number)
     const perfDate = new Date(festDay)
@@ -36,10 +36,10 @@ export async function GET(req: Request) {
 
   let sent = 0
 
-  for (const perf of upcoming) {
+  for (const item of upcoming) {
     const payload = JSON.stringify({
-      title: perf.artist,
-      body: `O 30 minút začína · Starting in 30 min · ${perf.startTime}`,
+      title: item.title,
+      body: `O 30 minút začína · Starting in 30 min · ${item.startTime}`,
       url: '/program',
     })
 
@@ -55,5 +55,5 @@ export async function GET(req: Request) {
     sent++
   }
 
-  return NextResponse.json({ sent, performances: upcoming.map((p) => p.artist) })
+  return NextResponse.json({ sent, program: upcoming.map((p) => p.title) })
 }
