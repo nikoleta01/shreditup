@@ -1,3 +1,5 @@
+import type { LocationKey } from "@/lib/data";
+
 export type Lang = "sk" | "en";
 
 export const translations = {
@@ -11,7 +13,11 @@ export const translations = {
       2: { label: "Sobota", short: "Sob 5.9." },
       3: { label: "Nedeľa", short: "Ned 6.9." },
     },
-    mainStage: "Hlavná scéna",
+    mainStage: "Hlavný stage",
+    locations: {
+      mainStage: "Hlavný stage",
+      skatepark: "Skatepark",
+    } satisfies Record<LocationKey, string>,
     install: {
       title: "Pridaj na plochu",
       desc: "Rýchly prístup k programu festivalu bez prehliadača.",
@@ -40,6 +46,10 @@ export const translations = {
       3: { label: "Sunday", short: "Sun 6/9" },
     },
     mainStage: "Main Stage",
+    locations: {
+      mainStage: "Main Stage",
+      skatepark: "Skatepark",
+    } satisfies Record<LocationKey, string>,
     install: {
       title: "Add to Home Screen",
       desc: "Quick access to the festival program without a browser.",

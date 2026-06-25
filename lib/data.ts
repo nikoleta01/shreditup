@@ -1,10 +1,20 @@
-export type Performance = {
+// Semantic event type — drives color coding in the timetable. Keep this
+// separate from `genre` (which is overloaded with music genres + reg status).
+export type Category = "music" | "workshop" | "registration" | "info";
+
+// Where an item happens. Stored as a key, not a label — the display string is
+// resolved per language via `t.locations[key]` in i18n.ts.
+export type LocationKey = "mainStage" | "skatepark";
+
+export type ProgramItem = {
   id: string;
-  artist: string;
+  title: string;
   day: 1 | 2 | 3;
   startTime: string;
   endTime: string;
   genre: string;
+  category: Category;
+  location?: LocationKey;
   description?: string;
   activityId?: string; // Supabase activities.id — only set for registerable items
 };
@@ -34,142 +44,152 @@ export const FESTIVAL_DAYS: Record<
 
 export const STAGE_NAME = "Main Stage";
 
-export const performances: Performance[] = [
+export const program: ProgramItem[] = [
   // Day 1 — Friday
   {
-    id: "d1-1",
-    artist: "Bubnovačka",
+    id: "d1-0",
+    title: "Registrácia",
     day: 1,
-    startTime: "19:00",
-    endTime: "20:00",
+    startTime: "16:00",
+    endTime: "22:30",
     genre: "Alternative",
+    category: "registration",
+    location: "mainStage",
+    description: "Kick off the festival weekend with our opening act.",
+  },
+  {
+    id: "d1-1",
+    title: "Bubnovačka s Rytmikou",
+    day: 1,
+    startTime: "19:30",
+    endTime: "20:30",
+    genre: "Alternative",
+    category: "music",
+    location: "mainStage",
     description: "Kick off the festival weekend with our opening act.",
   },
   {
     id: "d1-2",
-    artist: "The Gravel Road",
+    title: "Open Mic",
     day: 1,
-    startTime: "20:15",
-    endTime: "20:30",
+    startTime: "21:00",
+    endTime: "22:30",
     genre: "Folk Rock",
-  },
-  {
-    id: "d1-4",
-    artist: "Phantom Drift",
-    day: 1,
-    startTime: "20:30",
-    endTime: "22:00",
-    genre: "Electronic Rock",
-    description: "Headlining Friday with their immersive light show.",
-  },
-  {
-    id: "d1-5",
-    artist: "DJ Afterburn",
-    day: 1,
-    startTime: "22:30",
-    endTime: "00:00",
-    genre: "DJ Set",
+    category: "music",
+    location: "mainStage",
   },
 
   // Day 2 — Saturday
   {
     id: "d2-1",
-    artist: "Jóga s Jankou",
+    title: "Jóga s Jankou",
     day: 2,
     startTime: "10:00",
     endTime: "11:00",
     genre: "bez registrácie",
+    category: "workshop",
   },
   {
     id: "d2-2",
-    artist: "Surfskate lekcia 1",
+    title: "Surfskate lekcia 1",
     day: 2,
     startTime: "15:15",
     endTime: "16:30",
     genre: "registrácia",
+    category: "workshop",
+    location: "skatepark",
     activityId: "bb31bcd4-f772-4834-9ba0-7d04f6e0dc05",
   },
   {
     id: "d2-3",
-    artist: "Vortex Parade",
+    title: "Vortex Parade",
     day: 2,
     startTime: "16:45",
     endTime: "18:00",
     genre: "Post-Punk",
+    category: "music",
   },
   {
     id: "d2-4",
-    artist: "The Burning Maps",
+    title: "The Burning Maps",
     day: 2,
     startTime: "18:30",
     endTime: "20:00",
     genre: "Psychedelic Rock",
+    category: "music",
     description: "Extended set with special guests.",
   },
   {
     id: "d2-5",
-    artist: "MZRI",
+    title: "MZRI",
     day: 2,
     startTime: "20:30",
     endTime: "22:00",
     genre: "Electronic",
+    category: "music",
   },
   {
     id: "d2-6",
-    artist: "Saturday Headliner",
+    title: "Saturday Headliner",
     day: 2,
     startTime: "22:30",
     endTime: "00:30",
     genre: "Rock",
+    category: "music",
     description: "The biggest act of the weekend.",
   },
 
   // Day 3 — Sunday
   {
     id: "d3-1",
-    artist: "Morning Tide",
+    title: "Morning Tide",
     day: 3,
     startTime: "13:00",
     endTime: "14:00",
     genre: "Ambient",
+    category: "music",
   },
   {
     id: "d3-2",
-    artist: "Copper Fields",
+    title: "Copper Fields",
     day: 3,
     startTime: "14:15",
     endTime: "15:30",
     genre: "Country Rock",
+    category: "music",
   },
   {
     id: "d3-3",
-    artist: "Infrared",
+    title: "Infrared",
     day: 3,
     startTime: "15:45",
     endTime: "17:00",
     genre: "Synth Pop",
+    category: "music",
   },
   {
     id: "d3-4",
-    artist: "Last Call Collective",
+    title: "Last Call Collective",
     day: 3,
     startTime: "17:30",
     endTime: "19:00",
     genre: "Indie Folk",
+    category: "music",
   },
   {
     id: "d3-5",
-    artist: "Sunday Closer",
+    title: "Sunday Closer",
     day: 3,
     startTime: "19:30",
     endTime: "21:30",
     genre: "Alternative Rock",
+    category: "music",
     description: "Closing the festival with an unforgettable set.",
   },
 ];
 
-export function getPerformancesByDay(day: 1 | 2 | 3) {
-  return performances
+export function getProgramByDay(day: 1 | 2 | 3) {
+  return program
     .filter((p) => p.day === day)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 }

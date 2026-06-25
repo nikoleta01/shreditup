@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getPerformancesByDay, type Performance } from "@/lib/data";
+import { getProgramByDay, type ProgramItem } from "@/lib/data";
 import { useLang } from "@/components/language-provider";
 import { DayTabs } from "@/components/day-tabs";
 import { WaveChip } from "@/components/wave-chip";
@@ -15,12 +15,12 @@ type Modal =
   | { type: "confirm"; activityId: string; activityName: string }
   | { type: "name-form"; activityId: string; activityName: string };
 
-function PerformanceCard({
+function ProgramCard({
   p,
   registered,
   onRegister,
 }: {
-  p: Performance;
+  p: ProgramItem;
   registered: boolean;
   onRegister: (activityId: string, activityName: string) => void;
 }) {
@@ -42,7 +42,7 @@ function PerformanceCard({
       </div>
       <div className="flex-1 space-y-1 pb-1">
         <div>
-          <WaveChip className="text-base">{p.artist}</WaveChip>
+          <WaveChip className="text-base">{p.title}</WaveChip>
         </div>
         <div>
           <span
@@ -66,7 +66,7 @@ function PerformanceCard({
               </span>
             ) : (
               <button
-                onClick={() => onRegister(p.activityId!, p.artist)}
+                onClick={() => onRegister(p.activityId!, p.title)}
                 className="border-2 border-foreground bg-foreground px-3 py-1 text-xs font-bold text-background transition-colors hover:bg-transparent hover:text-foreground"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
@@ -245,8 +245,8 @@ export default function ProgramPage() {
         </p>
 
         <div className="divide-y-2 divide-foreground/20">
-          {getPerformancesByDay(activeDay).map((p) => (
-            <PerformanceCard
+          {getProgramByDay(activeDay).map((p) => (
+            <ProgramCard
               key={p.id}
               p={p}
               registered={!!p.activityId && registeredIds.has(p.activityId)}
