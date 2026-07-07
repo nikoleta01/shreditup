@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, List, CalendarCheck } from 'lucide-react'
+import { CalendarDays, List, CalendarCheck, Compass } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLang } from '@/components/language-provider'
 import { ChainBorder } from '@/components/chain-border'
@@ -14,6 +14,7 @@ export function BottomNav() {
   const links = [
     { href: '/program', label: t.program, icon: List },
     { href: '/timetable', label: t.timetable, icon: CalendarDays },
+    { href: '/map', label: t.map, icon: Compass },
     { href: '/registration', label: t.myActivities, icon: CalendarCheck },
   ]
 
@@ -21,7 +22,8 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50">
       {/* Wave border: background (orange) → card (blue) */}
       <ChainBorder flip />
-      <div className="flex h-16 items-center justify-around bg-card px-4">
+      <div className="bg-card pb-[env(safe-area-inset-bottom)]">
+        <div className="flex h-16 items-center justify-around px-4">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href)
           return (
@@ -44,6 +46,7 @@ export function BottomNav() {
             </Link>
           )
         })}
+        </div>
       </div>
     </nav>
   )

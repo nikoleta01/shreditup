@@ -24,34 +24,51 @@ function ProgramCard({
   registered: boolean;
   onRegister: (activityId: string, activityName: string) => void;
 }) {
+  const { t } = useLang();
   return (
     <div className="flex gap-4 py-4">
       <div className="flex w-14 shrink-0 flex-col items-end pt-0.5">
         <span
-          className="text-sm font-bold tabular-nums text-foreground"
-          style={{ fontFamily: "var(--font-barlow-condensed)" }}
+          className="text-sm font-bold tabular-nums text-black"
+          style={{
+            fontFamily: "var(--font-barlow-condensed)",
+            textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
+          }}
         >
           {p.startTime}
         </span>
         <span
-          className="text-xs tabular-nums text-foreground/85"
-          style={{ fontFamily: "var(--font-barlow-condensed)" }}
+          className="text-xs tabular-nums text-black"
+          style={{
+            fontFamily: "var(--font-barlow-condensed)",
+            textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
+          }}
         >
           {p.endTime}
         </span>
       </div>
       <div className="flex-1 space-y-1 pb-1">
-        <div>
+        <div className="flex flex-wrap items-center gap-2">
           <WaveChip className="text-base">{p.title}</WaveChip>
+          {!p.activityId && p.category === "workshop" && (
+            <span
+              className="text-xs font-bold text-foreground/60"
+              style={{ fontFamily: "var(--font-barlow-condensed)" }}
+            >
+              {t.noRegistration}
+            </span>
+          )}
         </div>
-        <div>
-          <span
-            className="text-[11px] font-bold uppercase tracking-wide text-foreground/80"
-            style={{ fontFamily: "var(--font-barlow-condensed)" }}
-          >
-            {p.genre}
-          </span>
-        </div>
+        {p.genre && (
+          <div>
+            <span
+              className="text-[11px] font-bold uppercase tracking-wide text-foreground/80"
+              style={{ fontFamily: "var(--font-barlow-condensed)" }}
+            >
+              {p.genre}
+            </span>
+          </div>
+        )}
         {p.description && (
           <p className="text-sm text-foreground/85">{p.description}</p>
         )}

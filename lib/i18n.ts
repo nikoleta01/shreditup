@@ -7,6 +7,7 @@ export const translations = {
     program: "Program",
     timetable: "Harmonogram",
     myActivities: "Moje aktivity",
+    map: "Mapa",
     festivalDates: "4–6 Sep 2026",
     days: {
       1: { label: "Piatok", short: "Pia 4.9." },
@@ -27,6 +28,7 @@ export const translations = {
       iosChromeHint: "Klikni na",
       iosChromeThen: '••• dole vpravo, potom "Pridať na plochu".',
       close: "Zavrieť",
+      notify: "Nezabudni kliknúť na zvonček hore, aby ti nič neuniklo.",
     },
     notifications: {
       enable: "Zapnúť notifikácie",
@@ -34,11 +36,13 @@ export const translations = {
       notSupported: "Notifikácie nie sú podporované.",
     },
     notifyBefore: "O 30 minút začína",
+    noRegistration: "Bez registrácie",
   },
   en: {
     program: "Program",
     timetable: "Timetable",
     myActivities: "My Activities",
+    map: "Map",
     festivalDates: "4–6 Sep 2026",
     days: {
       1: { label: "Friday", short: "Fri 4/9" },
@@ -59,6 +63,7 @@ export const translations = {
       iosChromeHint: "Tap",
       iosChromeThen: '••• (bottom right), then "Add to Home Screen".',
       close: "Close",
+      notify: "Don't forget to tap the bell above so you don't miss anything.",
     },
     notifications: {
       enable: "Enable notifications",
@@ -66,6 +71,7 @@ export const translations = {
       notSupported: "Notifications not supported.",
     },
     notifyBefore: "Starting in 30 minutes",
+    noRegistration: "No registration",
   },
 } satisfies Record<Lang, unknown>;
 
