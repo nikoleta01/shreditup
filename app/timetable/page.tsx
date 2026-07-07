@@ -97,7 +97,9 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
         left: `calc(${p.left * 100}% + 2px)`,
         width: `calc(${p.width * 100}% - 4px)`,
         zIndex: p.z,
-        backgroundColor: CATEGORY_COLOR[p.category],
+        backgroundColor: p.category
+          ? CATEGORY_COLOR[p.category]
+          : "var(--muted)",
       }}
     >
       <p

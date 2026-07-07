@@ -1,15 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Share, Plus, MoreHorizontal } from "lucide-react";
+import { X, Share, Plus, MoreHorizontal, BellOff } from "lucide-react";
 import { useLang } from "@/components/language-provider";
 
 type InstallState = "hidden" | "android" | "ios-safari" | "ios-chrome";
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => void;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
 export function InstallPrompt() {
   const { t } = useLang();
   const [state, setState] = useState<InstallState>("hidden");
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     if (window.matchMedia("(display-mode: standalone)").matches) return;
@@ -18,13 +24,15 @@ export function InstallPrompt() {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     if (isIOS) {
       const isChrome = /CriOS/.test(navigator.userAgent);
+      // Environment detection can only run client-side after mount.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setState(isChrome ? "ios-chrome" : "ios-safari");
       return;
     }
 
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       setState("android");
     };
     window.addEventListener("beforeinstallprompt", handler as EventListener);
@@ -104,6 +112,13 @@ export function InstallPrompt() {
             </p>
           </>
         ) : null}
+
+        <p className="flex items-center gap-1.5 text-xs text-primary-foreground/70">
+          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-foreground bg-foreground text-background">
+            <BellOff className="h-3 w-3" aria-hidden />
+          </span>
+          {t.install.notify}
+        </p>
       </div>
 
       <button

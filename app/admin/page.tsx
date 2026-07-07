@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { AdminLogin } from './_components/AdminLogin'
+import { BroadcastForm } from './_components/BroadcastForm'
 import { getAdminSupabase } from '@/lib/supabase-admin'
 import { FESTIVAL_DAYS } from '@/lib/data'
 import { WaveChip } from '@/components/wave-chip'
@@ -34,9 +35,10 @@ export default async function AdminPage() {
 
   const supabase = getAdminSupabase()
 
-  const [{ data: activities }, { data: allRegs }] = await Promise.all([
+  const [{ data: activities }, { data: allRegs }, { count: subscriberCount }] = await Promise.all([
     supabase.from('activities').select('id, name, day, start_time, capacity').order('day').order('start_time'),
     supabase.from('activity_registrations').select('activity_id, user_id'),
+    supabase.from('push_subscriptions').select('*', { count: 'exact', head: true }),
   ])
 
   const userIds = [...new Set(((allRegs ?? []) as Registration[]).map((r) => r.user_id))]
@@ -72,6 +74,8 @@ export default async function AdminPage() {
       >
         Účastníci aktivít
       </p>
+
+      <BroadcastForm subscriberCount={subscriberCount ?? 0} />
 
       <div className="space-y-4">
         {activitiesWithParticipants.map((activity) => (

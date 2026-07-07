@@ -35,7 +35,7 @@ export function ChainBorder({ flip = false }: { flip?: boolean }) {
     >
       {/* top fill = card (blue), bottom fill = background (orange), or inverse when flipped */}
       <path d={topFill} style={{ fill: 'var(--card)' }} />
-      <path d={botFill} style={{ fill: 'var(--background)' }} />
+      <path d={botFill} style={{ fill: 'transparent' }} />
       <path d={waveLine} fill="none" style={{ stroke: 'var(--foreground)' }} strokeWidth={1.5} />
     </svg>
   )

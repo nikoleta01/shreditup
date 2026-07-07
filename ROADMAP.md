@@ -9,6 +9,7 @@
 - Activity registration with capacity enforcement at DB level (Postgres function with row lock — prevents race conditions even with 200 simultaneous users)
 - "Moje aktivity" nav item (was: Registrácia na aktivity)
 - Wave chip component for artist names
+- Admin view — password-protected `/admin` page showing registrations per activity, with per-activity CSV export (`admin_auth` cookie + `ADMIN_PASSWORD`)
 
 ---
 
@@ -54,10 +55,28 @@ Allow users to cancel their registration for a workshop or lesson.
 - Simple list grouped by day
 - Empty state: "Zatiaľ nie si prihlásený/á na žiadnu aktivitu"
 
+### Photo wall — community photos projected at the festival
+**Context:** A projector (pointed at a bedsheet/screen at the venue) displays a live slideshow of photos contributed by attendees. Attendees upload via a QR code on a physical poster — **the upload page is intentionally NOT in the app menu**, to keep the app's everyday face minimal (program, quick glance, done) and avoid pulling people onto their phones. Every photo is moderated before it appears: nothing goes public without admin approval. Admin (Nikoleta) approves from the registration desk during the festival.
+
+**Design principles (do not violate):**
+- **No engagement mechanics** — no likes, no comments, no "your photo is live" notifications. Upload-and-forget, one-way street. This is deliberate: the feature must reinforce "be present," not become an attention loop.
+- **Default-private** — `status = 'pending'` on upload, private bucket. Public requires an explicit admin approve. The DB default is the safety guarantee.
+- **Wall is a look-up experience** — its home is the projector, not anyone's phone. Hidden from the menu.
+
+**What's needed:**
+- **DB:** `photos` table — `id`, `user_id` (→ `profiles`, for attribution; name only, no email), `storage_path`, `status` (`pending`|`approved`|`rejected`), `is_seed` (bool), `created_at`, `approved_at`. RLS: only service-role (admin) reads pending photos.
+- **Storage:** private Supabase Storage bucket `photos`. Free tier is sufficient (1 GB ≈ 2,500 resized photos; 5 GB/mo egress easily covers one projector). Optionally upgrade to Pro ($25) for the festival month only — removes the 1-week inactivity pause risk and adds headroom; cancel after.
+- **Resize on upload** — downscale to ~1600px long edge (~400 KB) in the upload API route with `sharp` *before* storing. This is the main storage/egress lever (5–10× more photos per GB). Do NOT use Supabase's built-in image transformation (Pro-only, paid) — resize ourselves.
+- **Upload page** (`/upload` or similar, unlinked): logged-in profile (reuse lazy anonymous auth) → pick photo → resize → upload to private bucket → insert `pending` row tied to `user_id`.
+- **Admin approval:** new block on `/admin` (reuse existing `admin_auth` cookie / `ADMIN_PASSWORD`, same per-route pattern as the CSV export). Thumbnails of `pending` photos with Approve / Reject. Approve → `status = 'approved'` + `approved_at`. Reject → delete file + row.
+- **Wall page** (`/wall`, NOT in menu, bookmarked on the projector laptop): full-screen auto-advancing slideshow with cross-fade. Polls an API every ~5s for `approved` photos (polling chosen over Realtime — survives flaky festival wifi, "appears within 5s" reads as real-time to a crowd). Protect with a `?key=` token so a random person can't pull up the feed.
+- **Egress gotcha to get right:** photo URLs served to the wall must be **stable/cacheable** so the projector's browser caches each image and doesn't re-download it every poll cycle. Use a long-lived signed URL (valid for the whole festival) or serve approved photos from a public bucket. Regenerating signed URLs every poll would burn egress.
+- **Seed photos:** ~20 curated images pre-loaded as `status = 'approved'`, `is_seed = true` before the festival, so the wall looks alive from minute one (an empty wall on day one looks broken). The wall doesn't distinguish their origin.
+- **Lifecycle:** no expiry during the event — the wall only grows richer over the weekend, and disappearing photos feel arbitrary to contributors. Wipe the bucket manually after the festival. `is_seed` exempts curated photos from cleanup and doubles as a manual "remove this one" lever.
+
 ---
 
 ## 💡 Ideas (not committed)
 
 - **QR code per activity** — scan at the activity entrance to confirm attendance
-- **Admin view** — simple password-protected page showing registrations per activity (useful for workshop organisers)
 - **Cancellation deadline** — prevent cancellation within X hours of the activity start (to avoid last-minute no-shows gaming the waitlist)
