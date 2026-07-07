@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="flex flex-col bg-card px-4 pt-2 pb-1.5">
+      <div className="flex flex-col bg-card px-4 pb-1.5 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
         <div className="flex items-center justify-between">
           <span
             className="text-xl leading-none text-card-foreground"
