@@ -59,16 +59,6 @@ function ProgramCard({
             </span>
           )}
         </div>
-        {p.genre && (
-          <div>
-            <span
-              className="text-[11px] font-bold uppercase tracking-wide text-foreground/80"
-              style={{ fontFamily: "var(--font-barlow-condensed)" }}
-            >
-              {p.genre}
-            </span>
-          </div>
-        )}
         {p.description && (
           <p className="text-sm text-foreground/85">{p.description}</p>
         )}
