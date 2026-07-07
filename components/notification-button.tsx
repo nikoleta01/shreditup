@@ -71,12 +71,6 @@ export function NotificationButton() {
 
   return (
     <span className="relative inline-flex">
-      {pulsing && (
-        <span
-          className="pointer-events-none absolute inset-0 animate-ping rounded border-2 border-foreground"
-          aria-hidden
-        />
-      )}
       <button
         onClick={toggle}
         aria-label={subscribed ? t.notifications.disable : t.notifications.enable}
@@ -85,7 +79,10 @@ export function NotificationButton() {
         {subscribed ? (
           <Bell className="h-[14px] w-[14px] fill-current" aria-hidden />
         ) : (
-          <BellOff className="h-[14px] w-[14px]" aria-hidden />
+          <BellOff
+            className={`h-[14px] w-[14px] ${pulsing ? 'animate-bell-ring' : ''}`}
+            aria-hidden
+          />
         )}
       </button>
     </span>

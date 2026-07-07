@@ -113,3 +113,33 @@
 .font-condensed {
   font-family: var(--font-barlow-condensed), sans-serif;
 }
+
+/* ── Bell ring animation ── */
+/* Swings briefly, then rests for most of the cycle so it rings only occasionally. */
+@keyframes bell-ring {
+  0%,
+  82%,
+  100% {
+    transform: rotate(0deg);
+  }
+  84% {
+    transform: rotate(14deg);
+  }
+  87% {
+    transform: rotate(-11deg);
+  }
+  90% {
+    transform: rotate(8deg);
+  }
+  93% {
+    transform: rotate(-5deg);
+  }
+  96% {
+    transform: rotate(2deg);
+  }
+}
+
+.animate-bell-ring {
+  transform-origin: 50% 15%;
+  animation: bell-ring 4s ease-in-out infinite;
+}
