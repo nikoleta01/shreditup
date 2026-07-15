@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import webpush from 'web-push'
-import { getSupabase } from '@/lib/supabase'
+import { getAdminSupabase } from '@/lib/supabase-admin'
 import { program, FESTIVAL_DAYS } from '@/lib/data'
 
 export async function GET(req: Request) {
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ sent: 0 })
   }
 
-  const { data: subs } = await getSupabase().from('push_subscriptions').select('*')
+  const { data: subs } = await getAdminSupabase().from('push_subscriptions').select('*')
   if (!subs || subs.length === 0) return NextResponse.json({ sent: 0 })
 
   let sent = 0

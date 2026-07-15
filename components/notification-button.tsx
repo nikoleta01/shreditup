@@ -18,6 +18,7 @@ export function NotificationButton() {
   const [supported, setSupported] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const [hinted, setHinted] = useState(true)
+  const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -31,6 +32,7 @@ export function NotificationButton() {
   }, [])
 
   async function toggle() {
+    setErr(null)
     if (!hinted) {
       localStorage.setItem('notif-hinted', '1')
       setHinted(true)
@@ -42,26 +44,32 @@ export function NotificationButton() {
       if (!next) {
         const sub = await reg.pushManager.getSubscription()
         await sub?.unsubscribe()
-        await fetch('/api/push/unsubscribe', {
+        const res = await fetch('/api/push/unsubscribe', {
           method: 'POST',
           body: JSON.stringify({ endpoint: sub?.endpoint }),
           headers: { 'Content-Type': 'application/json' },
         })
+        if (!res.ok) throw new Error(`unsubscribe failed (HTTP ${res.status})`)
       } else {
+        const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+        if (!key) throw new Error('VAPID public key missing from this build')
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(
-            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
-          ),
+          applicationServerKey: urlBase64ToUint8Array(key),
         })
-        await fetch('/api/push/subscribe', {
+        const res = await fetch('/api/push/subscribe', {
           method: 'POST',
           body: JSON.stringify(JSON.parse(JSON.stringify(sub))),
           headers: { 'Content-Type': 'application/json' },
         })
+        if (!res.ok) throw new Error(`save failed (HTTP ${res.status})`)
       }
-    } catch {
+    } catch (e) {
+      // Revert the optimistic toggle and surface the reason. On an installed
+      // iOS PWA there's no devtools, so a visible message is the only way to
+      // see why subscribing failed (permission denied, missing key, 500, …).
       setSubscribed(!next)
+      setErr(e instanceof Error ? e.message : String(e))
     }
   }
 
@@ -85,6 +93,15 @@ export function NotificationButton() {
           />
         )}
       </button>
+      {err && (
+        <span
+          role="alert"
+          onClick={() => setErr(null)}
+          className="absolute right-0 top-full z-50 mt-1 max-w-[70vw] cursor-pointer whitespace-normal rounded bg-red-600 px-2 py-1 text-[10px] leading-tight text-white shadow-lg"
+        >
+          {err}
+        </span>
+      )}
     </span>
   )
 }

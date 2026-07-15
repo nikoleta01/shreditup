@@ -4,15 +4,7 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { useLang } from "@/components/language-provider";
 import { WaveChip } from "@/components/wave-chip";
-
-type Activity = {
-  id: string;
-  name: string;
-  description: string | null;
-  day: number;
-  start_time: string;
-  capacity: number;
-};
+import { getRegisterableActivity, type ProgramItem } from "@/lib/data";
 
 type Profile = {
   first_name: string;
@@ -21,7 +13,6 @@ type Profile = {
 
 export default function RegistrationPage() {
   const { t } = useLang();
-  const [activities, setActivities] = useState<Activity[]>([]);
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -36,13 +27,11 @@ export default function RegistrationPage() {
       if (!session) { setLoading(false); return; }
       setUserId(session.user.id);
 
-      const [{ data: acts }, { data: prof }, { data: regs }] = await Promise.all([
-        supabase.from("activities").select("*").order("day").order("start_time"),
+      const [{ data: prof }, { data: regs }] = await Promise.all([
         supabase.from("profiles").select("first_name, last_name").eq("id", session.user.id).maybeSingle(),
         supabase.from("activity_registrations").select("activity_id").eq("user_id", session.user.id),
       ]);
 
-      setActivities(acts ?? []);
       setProfile(prof ?? null);
       setRegisteredIds(new Set((regs ?? []).map((r: { activity_id: string }) => r.activity_id)));
       setLoading(false);
@@ -86,7 +75,12 @@ export default function RegistrationPage() {
     );
   }
 
-  const myActivities = activities.filter((a) => registeredIds.has(a.id));
+  // Registrations only store the activity id; every display field (title, day,
+  // time, description) is resolved from lib/data.ts — the single source of truth.
+  const myActivities = [...registeredIds]
+    .map((id) => ({ id, item: getRegisterableActivity(id) }))
+    .filter((x): x is { id: string; item: ProgramItem } => !!x.item)
+    .sort((a, b) => a.item.day - b.item.day || a.item.startTime.localeCompare(b.item.startTime));
 
   return (
     <div className="mx-auto max-w-md px-4 pt-8">
@@ -120,30 +114,30 @@ export default function RegistrationPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {myActivities.map((activity) => (
-            <div key={activity.id} className="border-2 border-foreground bg-card p-4">
+          {myActivities.map(({ id, item }) => (
+            <div key={id} className="border-2 border-foreground bg-card p-4">
               <div className="mb-2">
-                <WaveChip className="text-sm">{activity.name}</WaveChip>
+                <WaveChip className="text-sm">{item.title}</WaveChip>
               </div>
               <div
                 className="mb-4 flex gap-3 text-xs text-foreground/60"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
-                <span>{dayLabel(activity.day)}</span>
-                <span>{activity.start_time}</span>
+                <span>{dayLabel(item.day)}</span>
+                <span>{item.startTime}</span>
               </div>
-              {activity.description && (
+              {item.description && (
                 <p className="mb-4 text-sm text-foreground/70" style={{ fontFamily: "var(--font-barlow-condensed)" }}>
-                  {activity.description}
+                  {item.description}
                 </p>
               )}
               <button
-                disabled={unregistering === activity.id}
-                onClick={() => handleUnregister(activity.id)}
+                disabled={unregistering === id}
+                onClick={() => handleUnregister(id)}
                 className="border-2 border-foreground px-4 py-1.5 text-xs font-bold text-foreground transition-colors hover:bg-foreground hover:text-background disabled:opacity-40"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
-                {unregistering === activity.id ? "Odhlasujem..." : "Odhlásiť sa"}
+                {unregistering === id ? "Odhlasujem..." : "Odhlásiť sa"}
               </button>
             </div>
           ))}

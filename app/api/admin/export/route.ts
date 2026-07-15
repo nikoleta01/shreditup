@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { getAdminSupabase } from '@/lib/supabase-admin'
+import { getRegisterableActivity } from '@/lib/data'
 
 export async function GET(req: Request) {
   const adminPassword = process.env.ADMIN_PASSWORD
@@ -16,10 +17,10 @@ export async function GET(req: Request) {
 
   const supabase = getAdminSupabase()
 
-  const [{ data: regs, error }, { data: activity }] = await Promise.all([
-    supabase.from('activity_registrations').select('user_id').eq('activity_id', activityId),
-    supabase.from('activities').select('name').eq('id', activityId).single(),
-  ])
+  const { data: regs, error } = await supabase
+    .from('activity_registrations')
+    .select('user_id')
+    .eq('activity_id', activityId)
 
   if (error) return new Response(error.message, { status: 500 })
 
@@ -33,7 +34,9 @@ export async function GET(req: Request) {
   )
   const csv = ['Meno,Priezvisko', ...rows].join('\n')
 
-  const filename = (activity?.name ?? activityId).replace(/[^a-z0-9\-]/gi, '_') + '-ucastnici.csv'
+  // Activity name for the filename comes from lib/data.ts, not the DB.
+  const name = getRegisterableActivity(activityId)?.title ?? activityId
+  const filename = name.replace(/[^a-z0-9\-]/gi, '_') + '-ucastnici.csv'
 
   return new Response(csv, {
     headers: {
