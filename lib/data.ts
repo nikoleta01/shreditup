@@ -3,7 +3,7 @@ export type Category = "music" | "workshop" | "registration" | "info";
 
 // Where an item happens. Stored as a key, not a label — the display string is
 // resolved per language via `t.locations[key]` in i18n.ts.
-export type LocationKey = "mainStage" | "skatepark";
+export type LocationKey = "mainStage" | "skatepark" | "bonfire";
 
 export type ProgramItem = {
   id: string;
@@ -77,7 +77,7 @@ export const program: ProgramItem[] = [
     startTime: "21:00",
     endTime: "23:00",
     category: "music",
-    location: "mainStage",
+    location: "bonfire",
   },
 
   // Day 2 — Saturday
@@ -176,6 +176,8 @@ export function getProgramByDay(day: 1 | 2 | 3) {
 // (their capacity + registrations live in the DB `activities` table, keyed by
 // that id). Everything displayable about them — title, day, time, description —
 // is resolved here from the program: the single source of truth.
-export function getRegisterableActivity(activityId: string): ProgramItem | undefined {
+export function getRegisterableActivity(
+  activityId: string,
+): ProgramItem | undefined {
   return program.find((p) => p.activityId === activityId);
 }

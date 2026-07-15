@@ -18,6 +18,7 @@ export const translations = {
     locations: {
       mainStage: "Hlavný stage",
       skatepark: "Skatepark",
+      bonfire: "Ohnisko",
     } satisfies Record<LocationKey, string>,
     install: {
       title: "Pridaj na plochu",
@@ -53,6 +54,7 @@ export const translations = {
     locations: {
       mainStage: "Main Stage",
       skatepark: "Skatepark",
+      ohnisko: "Campfire",
     } satisfies Record<LocationKey, string>,
     install: {
       title: "Add to Home Screen",

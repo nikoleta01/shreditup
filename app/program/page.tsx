@@ -48,15 +48,29 @@ function ProgramCard({
         </span>
       </div>
       <div className="flex-1 space-y-1 pb-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <WaveChip className="text-base">{p.title}</WaveChip>
-          {!p.activityId && p.category === "workshop" && (
-            <span
-              className="text-xs font-bold text-foreground/60"
-              style={{ fontFamily: "var(--font-barlow-condensed)" }}
-            >
-              {t.noRegistration}
-            </span>
+        <div>
+          <h3
+            className="text-base font-bold leading-tight text-foreground"
+            style={{ fontFamily: "var(--font-barlow-condensed)" }}
+          >
+            {p.title}
+          </h3>
+          {(p.location || (!p.activityId && p.category === "workshop")) && (
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {p.location && (
+                <WaveChip className="text-xs">
+                  {t.locations[p.location]}
+                </WaveChip>
+              )}
+              {!p.activityId && p.category === "workshop" && (
+                <span
+                  className="text-xs font-bold text-foreground/60"
+                  style={{ fontFamily: "var(--font-barlow-condensed)" }}
+                >
+                  {t.noRegistration}
+                </span>
+              )}
+            </div>
           )}
         </div>
         {p.description && (
