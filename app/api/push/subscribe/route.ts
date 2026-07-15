@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSupabase } from '@/lib/supabase'
+import { getAdminSupabase } from '@/lib/supabase-admin'
 
 export async function POST(req: Request) {
   const sub = await req.json()
@@ -9,10 +9,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
   }
 
-  await getSupabase().from('push_subscriptions').upsert(
+  const { error } = await getAdminSupabase().from('push_subscriptions').upsert(
     { endpoint, p256dh: keys.p256dh, auth: keys.auth },
     { onConflict: 'endpoint' }
   )
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   return NextResponse.json({ success: true })
 }

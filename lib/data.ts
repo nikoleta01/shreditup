@@ -171,3 +171,11 @@ export function getProgramByDay(day: 1 | 2 | 3) {
     .filter((p) => p.day === day)
     .sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
 }
+
+// Registerable activities are the subset of the program carrying an `activityId`
+// (their capacity + registrations live in the DB `activities` table, keyed by
+// that id). Everything displayable about them — title, day, time, description —
+// is resolved here from the program: the single source of truth.
+export function getRegisterableActivity(activityId: string): ProgramItem | undefined {
+  return program.find((p) => p.activityId === activityId);
+}

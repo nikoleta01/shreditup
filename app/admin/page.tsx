@@ -2,14 +2,11 @@ import { cookies } from 'next/headers'
 import { AdminLogin } from './_components/AdminLogin'
 import { BroadcastForm } from './_components/BroadcastForm'
 import { getAdminSupabase } from '@/lib/supabase-admin'
-import { FESTIVAL_DAYS } from '@/lib/data'
+import { FESTIVAL_DAYS, getRegisterableActivity } from '@/lib/data'
 import { WaveChip } from '@/components/wave-chip'
 
 type Activity = {
   id: string
-  name: string
-  day: number
-  start_time: string
   capacity: number
 }
 
@@ -36,7 +33,7 @@ export default async function AdminPage() {
   const supabase = getAdminSupabase()
 
   const [{ data: activities }, { data: allRegs }, { count: subscriberCount }] = await Promise.all([
-    supabase.from('activities').select('id, name, day, start_time, capacity').order('day').order('start_time'),
+    supabase.from('activities').select('id, capacity'),
     supabase.from('activity_registrations').select('activity_id, user_id'),
     supabase.from('push_subscriptions').select('*', { count: 'exact', head: true }),
   ])
@@ -49,16 +46,27 @@ export default async function AdminPage() {
 
   const profileMap = new Map(((profiles ?? []) as Profile[]).map((p) => [p.id, p]))
 
-  const activitiesWithParticipants = ((activities ?? []) as Activity[]).map((a) => ({
-    ...a,
-    participants: ((allRegs ?? []) as Registration[])
-      .filter((r) => r.activity_id === a.id)
-      .map((r) => profileMap.get(r.user_id))
-      .filter((p): p is Profile => !!p),
-  }))
+  // The DB row gives us only id + capacity; the display fields (title, day,
+  // time) are resolved from lib/data.ts by id — the single source of truth.
+  const activitiesWithParticipants = ((activities ?? []) as Activity[])
+    .map((a) => {
+      const item = getRegisterableActivity(a.id)
+      return {
+        id: a.id,
+        capacity: a.capacity,
+        title: item?.title ?? a.id,
+        day: item?.day,
+        startTime: item?.startTime,
+        participants: ((allRegs ?? []) as Registration[])
+          .filter((r) => r.activity_id === a.id)
+          .map((r) => profileMap.get(r.user_id))
+          .filter((p): p is Profile => !!p),
+      }
+    })
+    .sort((x, y) => (x.day ?? 99) - (y.day ?? 99) || (x.startTime ?? '').localeCompare(y.startTime ?? ''))
 
-  const dayLabel = (day: number) =>
-    FESTIVAL_DAYS[day as 1 | 2 | 3]?.short ?? `Deň ${day}`
+  const dayLabel = (day?: number) =>
+    day ? FESTIVAL_DAYS[day as 1 | 2 | 3]?.short ?? `Deň ${day}` : ''
 
   return (
     <div className="mx-auto max-w-md px-4 pt-8 pb-8">
@@ -81,14 +89,14 @@ export default async function AdminPage() {
         {activitiesWithParticipants.map((activity) => (
           <div key={activity.id} className="border-2 border-foreground bg-card p-4">
             <div className="mb-1">
-              <WaveChip className="text-sm">{activity.name}</WaveChip>
+              <WaveChip className="text-sm">{activity.title}</WaveChip>
             </div>
             <div
               className="mb-3 flex items-center gap-3 text-xs text-foreground/60"
               style={{ fontFamily: 'var(--font-barlow-condensed)' }}
             >
               <span>{dayLabel(activity.day)}</span>
-              <span>{activity.start_time}</span>
+              <span>{activity.startTime}</span>
               <span className="ml-auto font-bold text-foreground">
                 {activity.participants.length} / {activity.capacity}
               </span>

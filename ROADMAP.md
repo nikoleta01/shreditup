@@ -3,6 +3,7 @@
 ## ✅ Done
 
 - PWA setup (installable, offline-ready, push notifications)
+- Push notifications fixed in production (2026-07-14) — VAPID keys were missing from Vercel and the `push_subscriptions` table didn't exist in prod; both added. Subscribe/unsubscribe/cron now use the service-role client (RLS on), and the bell surfaces errors on-screen for iOS debugging
 - Program page with day tabs
 - Timetable page
 - Anonymous auth (Supabase) — silent sign-in on first register tap
@@ -20,6 +21,12 @@ Allow users to cancel their registration for a workshop or lesson.
 - Add "Odhlásiť sa" button on the program card (when registered)
 - Delete row from `activity_registrations`
 - Same race condition safety is not needed for unregister (deleting is always safe)
+
+### Finish i18n coverage — my follow-ups after the title-translation ticket
+**Context:** A colleague is making program *titles* bilingual (`title: { sk, en }` in `lib/data.ts`, resolved in the `/program` list and `/timetable` grid). These are the pieces I'm keeping for myself, to do after that lands.
+- **Push notifications (cron):** `app/api/cron/route.ts` sends `item.title` verbatim in the reminder. Once titles are `{ sk, en }`, decide which language to send *and* translate the notification copy itself. Push has no per-user language yet — either default to SK or store a lang preference per subscription. (The colleague will leave the cron route defaulting to `.sk` just so it compiles.)
+- **Program descriptions:** make `description` bilingual with the same pattern. It's optional — not every item has one — so the resolver must handle a missing value.
+- **"Moje aktivity" activity names:** that page (`app/registration/page.tsx`) reads `activities.name` from Supabase, NOT from `lib/data.ts`, so the title translation doesn't reach it. Preferred fix (no DB migration): the row and the static item are already linked by `activityId`, so look up the matching program item and show its `title[lang]` instead of the raw DB `name`. (Alternative = add a `name_en` column via a Supabase migration + backfill — more work, skip unless there's a reason.)
 
 ---
 

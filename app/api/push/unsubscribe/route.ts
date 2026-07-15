@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSupabase } from '@/lib/supabase'
+import { getAdminSupabase } from '@/lib/supabase-admin'
 
 export async function POST(req: Request) {
   const { endpoint } = await req.json()
@@ -8,7 +8,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing endpoint' }, { status: 400 })
   }
 
-  await getSupabase().from('push_subscriptions').delete().eq('endpoint', endpoint)
+  const { error } = await getAdminSupabase()
+    .from('push_subscriptions')
+    .delete()
+    .eq('endpoint', endpoint)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   return NextResponse.json({ success: true })
 }
