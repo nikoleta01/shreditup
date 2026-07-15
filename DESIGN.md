@@ -2,26 +2,34 @@
 
 ## Color Palette
 
-Extracted directly from the official festival poster. All values in OKLCH. **Full palette strategy** — four named color roles each used deliberately; no single neutral dominates.
+Extracted directly from the official festival poster. All values in OKLCH. **Strategy: "Light Sky" — full palette on a calm field.** The four poster colors are each used deliberately as *panels* (header/nav, badges, active states); a pale, cool sky pulled from the poster's own blue carries the surface. Dark-brown ink is the body text everywhere.
+
+> **Why not the orange drench?** The launch design made orange the full-screen surface (drenched strategy). Festival-goers reported it was tiring and hard to read outdoors in bright September sun — dark ink on the hot vermilion sits at only ~4.3:1 and the red vibrates against text. Principle 2 ("Legible in the wild") outranks the drench, so the surface moved to a pale field where ink hits ~11:1. Poster fidelity is preserved by keeping every poster color present and deliberate — the poster itself is only ~⅓ orange; its bottom third is this same blue. Orange is demoted from "the wall" to "the stamp" (a first-class accent for highlights and active states). *To trial "Poster Paper" (warm off-white) instead, `--surface` is a one-line swap documented in `app/globals.css`.*
 
 ```css
-/* Poster-faithful palette */
---color-orange:   oklch(0.60 0.19 32);    /* terracotta-orange — dominant brand surface */
---color-blue:     oklch(0.58 0.13 231);   /* cerulean sky — accent surface and border pattern */
---color-pink:     oklch(0.70 0.13 352);   /* warm pink — title balloon, stripe accent */
---color-olive:    oklch(0.56 0.09 107);   /* dusty olive-gold — borders, secondary fills */
---color-ink:      oklch(0.19 0.04 42);    /* near-black warm brown — all body type */
+/* Poster-faithful palette — fixed */
+--orange:  #da452c;                 /* vermilion — accent / stamp (header alt, highlights) */
+--blue:    oklch(0.58 0.13 231);    /* cerulean sky — header, bottom nav, day-tab rail, cards */
+--pink:    oklch(0.70 0.12 352);    /* warm pink — active day tab, timetable blocks */
+--olive:   #7b7834;                 /* dusty olive-gold — genre badges, primary fills */
+--ink:     oklch(0.19 0.04 42);     /* near-black warm brown — all body type & borders */
+
+/* Surface */
+--surface:      oklch(0.945 0.028 226);  /* #daf1fb — pale cool sky (the body background) */
+--surface-tint: oklch(0.90 0.03 226);    /* subtle panel / hover / input fill */
 
 /* Functional roles */
---background:     oklch(0.60 0.19 32);    /* orange IS the surface (drenched strategy) */
---foreground:     oklch(0.19 0.04 42);    /* dark brown for text */
---surface:        oklch(0.56 0.09 107);   /* olive-gold panels */
---surface-alt:    oklch(0.58 0.13 231);   /* blue panels */
---accent:         oklch(0.70 0.13 352);   /* pink highlights */
---muted:          oklch(0.30 0.05 42);    /* dark brown at 60% — secondary text */
+--background:   var(--surface);     /* the pale field */
+--foreground:   var(--ink);         /* dark brown for text */
+--card:         var(--blue);        /* blue panels — header, nav, tab rail */
+--primary:      var(--olive);       /* olive fills — badges, buttons */
+--secondary:    var(--pink);        /* pink — active states */
+--accent:       var(--pink);        /* pink highlights */
+--muted:        var(--surface-tint);/* subtle surface panel */
+--border:       var(--ink);         /* dark-brown hairlines & 2px outlines */
 ```
 
-**Text on color fills rule**: Use `--color-ink` (dark brown) on all poster-palette fills. Avoid white text — the poster uses dark brown on every background. This is the brand's contrast move.
+**Text on color fills rule**: Use `--ink` (dark brown) as text on the pale surface and on every poster-palette panel. Avoid white text — the poster uses dark brown on every background. This is the brand's contrast move. (The one place ink flips to a light tone is if the dark "Deep Dusk" surface variant is ever adopted.)
 
 ## Typography
 
@@ -113,4 +121,4 @@ The poster is the canonical design document. Key elements to echo:
 - Box shadows — poster is flat; UI should be too
 - Gray neutrals as primary surfaces — no shadcn defaults
 - Blue/pink as text colors — they are fill colors only; text is always `--color-ink`
-- White backgrounds — this is a drenched palette; the orange IS the bg
+- Pure-white or neutral-gray backgrounds — the surface is a poster-derived pale *sky* (`--surface`, tinted toward the brand's own blue), never `#fff` and never a shadcn gray. Warmth/coolness is carried by the tint, not by a default neutral.
