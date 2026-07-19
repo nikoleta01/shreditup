@@ -86,7 +86,9 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
 
   // Time is already obvious from the block's position on the grid, so prefer
   // showing the location. Fall back to the time for items without one.
-  const subtitle = p.location ? t.locations[p.location] : `${p.startTime}–${p.endTime}`;
+  const subtitle = p.location
+    ? t.locations[p.location]
+    : `${p.startTime}–${p.endTime}`;
 
   return (
     <div
@@ -188,12 +190,6 @@ export default function TimetablePage() {
           <DayTabs activeDay={activeDay} onChange={setActiveDay} />
         </div>
 
-        <p
-          className="mb-3 text-sm font-semibold uppercase tracking-widest text-foreground"
-          style={{ fontFamily: "var(--font-barlow-condensed)" }}
-        >
-          {t.days[activeDay].label}
-        </p>
         <DayTimetable day={activeDay} stageName={t.mainStage} />
       </div>
     </div>

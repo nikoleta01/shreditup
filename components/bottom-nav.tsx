@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { CalendarDays, List, CalendarCheck, Compass } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLang } from '@/components/language-provider'
-import { ChainBorder } from '@/components/chain-border'
 
 export function BottomNav() {
   const pathname = usePathname()
@@ -20,10 +19,8 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
-      {/* Wave border: background (orange) → card (blue) */}
-      <ChainBorder flip />
-      <div className="bg-card pb-[env(safe-area-inset-bottom)]">
-        <div className="flex h-16 items-center justify-around px-4">
+      <div className="border-t-2 border-foreground bg-nav pb-[env(safe-area-inset-bottom)]">
+        <div className="flex h-16 items-center px-2">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href)
           return (
@@ -31,18 +28,30 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex flex-col items-center gap-1 rounded px-6 py-2 transition-colors',
-                active
-                  ? 'text-card-foreground'
-                  : 'text-card-foreground/50 hover:text-card-foreground/80'
+                // flex-1 splits the bar into four equal columns. The old px-6
+                // burned ~192px of a ~360px screen on padding alone, which is
+                // what squeezed the longest label.
+                'flex flex-1 min-w-0 flex-col items-center gap-1 px-2 py-1.5',
+                // Every item stays at full ink — 4.98:1 on the olive ground.
+                // Don't reintroduce opacity to dim the inactive ones: ink on
+                // this olive is only 4.98:1 at full strength, so even a 10%
+                // fade drops under AA, and a translucent currentColor makes
+                // the icon's overlapping strokes stack into a marker-pen look.
+                'text-nav-foreground'
               )}
               style={{ fontFamily: 'var(--font-barlow-condensed)' }}
             >
               <Icon
-                className={cn('h-5 w-5', active && 'stroke-[2.5]')}
+                className={cn('h-5 w-5 shrink-0', active && 'stroke-[2.5]')}
                 aria-hidden
               />
-              <span className="text-xs font-semibold">{label}</span>
+              {/* Weights mirror DayTabs: 700 when active, 500 when not */}
+              <span
+                className="truncate text-xs"
+                style={{ fontWeight: active ? 700 : 500 }}
+              >
+                {label}
+              </span>
             </Link>
           )
         })}

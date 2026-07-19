@@ -58,7 +58,10 @@ function ProgramCard({
           {(p.location || (!p.activityId && p.category === "workshop")) && (
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {p.location && (
-                <WaveChip className="text-xs">
+                <WaveChip
+                  className="text-xs"
+                  tone={p.location === "bonfire" ? "bonfire" : "default"}
+                >
                   {t.locations[p.location]}
                 </WaveChip>
               )}
@@ -245,25 +248,18 @@ export default function ProgramPage() {
               aria-hidden
             />
             <span className="select-none text-sm text-foreground/80">×</span>
-            <span
-              className="text-sm font-bold text-foreground/85"
-              style={{ fontFamily: "var(--font-barlow-condensed)" }}
-            >
-              kamposlovensku
-            </span>
+            <Image
+              src="/kamposlovensku.png"
+              alt="KamPoSlovensku"
+              width={44}
+              height={45}
+            />
           </div>
         </div>
 
         <div className="mb-3">
           <DayTabs activeDay={activeDay} onChange={setActiveDay} />
         </div>
-
-        <p
-          className="mb-3 text-sm font-semibold uppercase tracking-widest text-foreground/80"
-          style={{ fontFamily: "var(--font-barlow-condensed)" }}
-        >
-          {t.days[activeDay].label}
-        </p>
 
         <div className="divide-y-2 divide-foreground/20">
           {getProgramByDay(activeDay).map((p) => (
