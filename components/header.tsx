@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { FESTIVAL_NAME } from "@/lib/data";
 import { NotificationButton } from "@/components/notification-button";
 import { useLang } from "@/components/language-provider";
@@ -12,12 +14,13 @@ export function Header() {
     <header className="sticky top-0 z-40">
       <div className="flex flex-col bg-card px-4 pb-1.5 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
         <div className="flex items-center justify-between">
-          <span
-            className="text-xl leading-none text-card-foreground"
+          <Link
+            href="/program"
+            className="rounded text-xl leading-none text-card-foreground transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
             style={{ fontFamily: "var(--font-alfa)" }}
           >
             {FESTIVAL_NAME}
-          </span>
+          </Link>
 
           <div className="flex shrink-0 items-center gap-2">
             <span

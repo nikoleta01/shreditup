@@ -33,6 +33,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav: var(--nav);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -52,22 +54,37 @@
   --olive:   #7b7834;
   --ink:     oklch(0.19 0.04 42);
 
-  /* Surface. To try "Poster Paper" instead, swap the next line for:
-     --surface: oklch(0.955 0.018 78);   (warm off-white, ~12:1) */
-  --surface:       oklch(0.945 0.028 226);  /* pale sky — #daf1fb */
-  --surface-tint:  oklch(0.90 0.03 226);    /* subtle panel / hover / input fill */
+  /* Lifted olive — the bottom nav's ground. The poster olive is a shade too
+     dark to carry the nav's 12px semibold labels: ink lands 4.06:1 on it,
+     under AA. Brightening ~8% takes it to 4.98:1 while reading as the same
+     colour on screen. Kept separate so the poster olive stays untouched. */
+  --olive-lift: #8a8740;
+
+  /* Surface — "Poster Paper": the warm stock a poster is printed on.
+     Ink text lands ~15.8:1 on it, the most legible surface we've had.
+     The previous cool "Light Sky" was: oklch(0.945 0.028 226) (#daf1fb). */
+  --surface:       #F4EBDD;                 /* warm paper — oklch(0.943 0.021 79) */
+  --surface-tint:  #e5dac9;                 /* subtle panel / hover / input fill */
 
   /* semantic tokens */
   --background:          var(--surface);
   --foreground:          var(--ink);
   --card:                var(--blue);
   --card-foreground:     var(--ink);
+  --nav:                 var(--olive-lift);
+  --nav-foreground:      var(--ink);
   --popover:             var(--surface);
   --popover-foreground:  var(--ink);
   --primary:             var(--olive);
   --primary-foreground:  var(--ink);
   --secondary:           var(--pink);
   --secondary-foreground: var(--ink);
+  /* Location chips. Pink is the default; bonfire is the one exception for now.
+     If the colour coding scheme changes, this is the place to redo it. */
+  --chip:                var(--pink);
+  --chip-foreground:     #000000;
+  --chip-bonfire:            #c93d26;
+  --chip-bonfire-foreground: #ffffff;
   --muted:              var(--surface-tint);
   --muted-foreground:    oklch(0.40 0.045 42);
   --accent:              var(--pink);

@@ -6,7 +6,7 @@ export const translations = {
   sk: {
     program: "Program",
     timetable: "Harmonogram",
-    myActivities: "Moje aktivity",
+    myActivities: "Aktivity",
     map: "Mapa",
     festivalDates: "4–6 Sep 2026",
     days: {
@@ -42,7 +42,7 @@ export const translations = {
   en: {
     program: "Program",
     timetable: "Timetable",
-    myActivities: "My Activities",
+    myActivities: "Activities",
     map: "Map",
     festivalDates: "4–6 Sep 2026",
     days: {
