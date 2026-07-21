@@ -47,7 +47,7 @@ export const program: ProgramItem[] = [
   // Day 1 — Friday
   {
     id: "d1-0",
-    title: "Registrácia",
+    title: "Registrácia a stavanie stanov",
     day: 1,
     startTime: "17:00",
     endTime: "19:00",
@@ -55,7 +55,7 @@ export const program: ProgramItem[] = [
   },
   {
     id: "d1-1",
-    title: "Bubnovačka s Rytmikou",
+    title: "Otvorenie festivalu a bubnovačka s Rytmikou",
     day: 1,
     startTime: "19:30",
     endTime: "20:30",
@@ -86,8 +86,8 @@ export const program: ProgramItem[] = [
     id: "d1-4",
     title: "DJ Robson",
     day: 1,
-    startTime: "23:00",
-    endTime: "00:00",
+    startTime: "23:30",
+    endTime: "03:00",
     category: "music",
     location: "mainStage",
   },
