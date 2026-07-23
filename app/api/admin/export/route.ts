@@ -35,7 +35,7 @@ export async function GET(req: Request) {
   const csv = ['Meno,Priezvisko', ...rows].join('\n')
 
   // Activity name for the filename comes from lib/data.ts, not the DB.
-  const name = getRegisterableActivity(activityId)?.title ?? activityId
+  const name = getRegisterableActivity(activityId)?.title.sk ?? activityId
   const filename = name.replace(/[^a-z0-9\-]/gi, '_') + '-ucastnici.csv'
 
   return new Response(csv, {

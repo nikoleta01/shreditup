@@ -25,7 +25,8 @@ function ProgramCard({
   registered: boolean;
   onRegister: (activityId: string, activityName: string) => void;
 }) {
-  const { t } = useLang();
+  const { t, tr } = useLang();
+  const title = tr(p.title);
   return (
     <div className="flex gap-4 py-4">
       <div className="flex w-14 shrink-0 flex-col items-end pt-0.5">
@@ -78,7 +79,7 @@ function ProgramCard({
           )}
         </div>
         {p.description && (
-          <p className="text-sm text-foreground/85">{p.description}</p>
+          <p className="text-sm text-foreground/85">{tr(p.description)}</p>
         )}
         {p.activityId && (
           <div className="pt-1">
@@ -91,7 +92,7 @@ function ProgramCard({
               </span>
             ) : (
               <button
-                onClick={() => onRegister(p.activityId!, p.title)}
+                onClick={() => onRegister(p.activityId!, title)}
                 className="border-2 border-foreground bg-foreground px-3 py-1 text-xs font-bold text-background transition-colors hover:bg-transparent hover:text-foreground"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >

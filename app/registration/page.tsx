@@ -12,7 +12,7 @@ type Profile = {
 };
 
 export default function RegistrationPage() {
-  const { t } = useLang();
+  const { t, tr } = useLang();
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -117,7 +117,7 @@ export default function RegistrationPage() {
           {myActivities.map(({ id, item }) => (
             <div key={id} className="border-2 border-foreground bg-card p-4">
               <div className="mb-2">
-                <WaveChip className="text-sm">{item.title}</WaveChip>
+                <WaveChip className="text-sm">{tr(item.title)}</WaveChip>
               </div>
               <div
                 className="mb-4 flex gap-3 text-xs text-foreground/60"
@@ -128,7 +128,7 @@ export default function RegistrationPage() {
               </div>
               {item.description && (
                 <p className="mb-4 text-sm text-foreground/70" style={{ fontFamily: "var(--font-barlow-condensed)" }}>
-                  {item.description}
+                  {tr(item.description)}
                 </p>
               )}
               <button

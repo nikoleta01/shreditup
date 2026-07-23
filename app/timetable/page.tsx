@@ -76,7 +76,7 @@ function layoutDay(items: ProgramItem[]): LaidOut[] {
 }
 
 function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
-  const { t } = useLang();
+  const { t, tr } = useLang();
   const top =
     ((timeToMinutes(p.startTime) - startHour * 60) / 60) * SLOT_HEIGHT;
   const height = Math.max(
@@ -108,7 +108,7 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
         className="truncate text-xs font-bold leading-tight text-foreground"
         style={{ fontFamily: "var(--font-barlow-condensed)" }}
       >
-        {p.title}
+        {tr(p.title)}
       </p>
       <p
         className="truncate text-[10px] text-foreground/60"

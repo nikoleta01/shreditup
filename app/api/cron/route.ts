@@ -38,7 +38,7 @@ export async function GET(req: Request) {
 
   for (const item of upcoming) {
     const payload = JSON.stringify({
-      title: item.title,
+      title: item.title.sk,
       body: `O 30 minút začína · Starting in 30 min · ${item.startTime}`,
       url: '/program',
     })
@@ -55,5 +55,5 @@ export async function GET(req: Request) {
     sent++
   }
 
-  return NextResponse.json({ sent, program: upcoming.map((p) => p.title) })
+  return NextResponse.json({ sent, program: upcoming.map((p) => p.title.sk) })
 }
