@@ -32,12 +32,12 @@ export function BottomNav() {
                 // burned ~192px of a ~360px screen on padding alone, which is
                 // what squeezed the longest label.
                 'flex flex-1 min-w-0 flex-col items-center gap-1 px-2 py-1.5',
-                // Every item stays at full ink — 4.98:1 on the olive ground.
-                // Don't reintroduce opacity to dim the inactive ones: ink on
-                // this olive is only 4.98:1 at full strength, so even a 10%
-                // fade drops under AA, and a translucent currentColor makes
-                // the icon's overlapping strokes stack into a marker-pen look.
-                'text-nav-foreground'
+                // Inactive items stay at full ink — 4.98:1 on the olive ground.
+                // Don't reintroduce opacity to dim them: ink on this olive is
+                // only 4.98:1 at full strength, so even a 10% fade drops under
+                // AA, and a translucent currentColor makes the icon's
+                // overlapping strokes stack into a marker-pen look.
+                active ? 'text-nav-foreground-active' : 'text-nav-foreground'
               )}
               style={{ fontFamily: 'var(--font-barlow-condensed)' }}
             >

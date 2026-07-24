@@ -6,6 +6,7 @@ import { getProgramByDay, type ProgramItem } from "@/lib/data";
 import { useLang } from "@/components/language-provider";
 import { DayTabs } from "@/components/day-tabs";
 import { WaveChip } from "@/components/wave-chip";
+import { ProgramTitle } from "@/components/program-title";
 import { ensureAnonymousSession, getSupabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
@@ -53,7 +54,7 @@ function ProgramCard({
             className="text-base font-bold leading-tight text-foreground"
             style={{ fontFamily: "var(--font-barlow-condensed)" }}
           >
-            {p.title}
+            <ProgramTitle p={p} />
           </h3>
           {(p.location || (!p.activityId && p.category === "workshop")) && (
             <div className="mt-1 flex flex-wrap items-center gap-2">

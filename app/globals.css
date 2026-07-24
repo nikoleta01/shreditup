@@ -34,6 +34,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-nav-foreground: var(--nav-foreground);
+  --color-nav-foreground-active: var(--nav-foreground-active);
   --color-nav: var(--nav);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -73,6 +74,12 @@
   --card-foreground:     var(--ink);
   --nav:                 var(--olive-lift);
   --nav-foreground:      var(--ink);
+  /* Active nav item. White is 3.74:1 on --olive-lift — under AA for a 12px
+     label, and it's the ceiling: any off-white is darker and scores worse.
+     Chosen anyway for the selected-state contrast against the ink siblings.
+     If AA here ever matters, darken --nav instead (white hits 4.59:1 on the
+     poster olive #7b7834). */
+  --nav-foreground-active: #ffffff;
   --popover:             var(--surface);
   --popover-foreground:  var(--ink);
   --primary:             var(--olive);

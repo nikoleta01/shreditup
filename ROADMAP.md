@@ -11,6 +11,7 @@
 - "Moje aktivity" nav item (was: Registrácia na aktivity)
 - Wave chip component for artist names
 - Admin view — password-protected `/admin` page showing registrations per activity, with per-activity CSV export (`admin_auth` cookie + `ADMIN_PASSWORD`)
+- Venue map (2026-07-23) — replaced the hand-drawn SVG schematic with a real satellite base (`public/map.jpeg`, ~380 KB) and 17 tappable POI pins (entrance, main stage, skate wave, tents ×4, yoga, restaurant, food truck, toilets, showers, bonfire, volleyball, P1/P2/pozdĺžne parking). Pins are percentage coords in `lib/map-pois.ts`; tap-to-place tool at `/map?place=1` (`components/venue-map-editor.tsx`) captures new coords. SK/EN legend, deduped by type. (An illustrated SVG variant + view toggle were prototyped and then dropped — satellite-only by choice.)
 
 ---
 
