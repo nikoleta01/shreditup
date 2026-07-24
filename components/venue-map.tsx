@@ -30,6 +30,7 @@ export default function VenueMap() {
 
         {MAP_POIS.map((p, i) => {
           const t = POI_TYPE_BY_ID[p.type];
+          if (!t) return null;
           const short = PARKING_SHORT[p.type];
           const isSel = selected === p.type;
           return (
@@ -72,6 +73,7 @@ export default function VenueMap() {
       <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 pb-4">
         {[...new Set(MAP_POIS.map((p) => p.type))].map((type) => {
           const t = POI_TYPE_BY_ID[type];
+          if (!t) return null;
           const short = PARKING_SHORT[type];
           const isSel = selected === type;
           return (
