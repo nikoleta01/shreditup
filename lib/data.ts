@@ -15,6 +15,7 @@ export type ProgramItem = {
   location?: LocationKey;
   description?: string;
   activityId?: string; // Supabase activities.id — only set for registerable items
+  link?: string;
 };
 
 export const FESTIVAL_NAME = "Shreditup";
@@ -60,7 +61,9 @@ export const program: ProgramItem[] = [
     endTime: "20:30",
     category: "music",
     location: "mainStage",
-    description: "Kick off the festival weekend with our opening act.",
+    description:
+      "Festival otvoríme spolu s Rytmikou, na konci môžete bubnovať spolu s nami.",
+    link: "https://rytmika.sk/",
   },
   {
     id: "d1-2",
