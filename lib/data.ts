@@ -7,13 +7,13 @@ export type LocationKey = "mainStage" | "skatepark" | "bonfire";
 
 export type ProgramItem = {
   id: string;
-  title: string;
+  title: { sk: string; en: string };
   day: 1 | 2 | 3;
   startTime: string;
   endTime: string;
   category?: Category;
   location?: LocationKey;
-  description?: string;
+  description?: { sk: string; en: string };
   activityId?: string; // Supabase activities.id — only set for registerable items
   link?: string;
 };
@@ -47,27 +47,35 @@ export const program: ProgramItem[] = [
   // Day 1 — Friday
   {
     id: "d1-0",
-    title: "Registrácia",
+    title: { sk: "Registrácia a stavanie stanov", en: "Registration & tent setup" },
     day: 1,
     startTime: "17:00",
     endTime: "19:00",
-    description: "Otvárame festivalové brány.",
+    description: {
+      sk: "Otvárame festivalové brány.",
+      en: "We're opening the festival gates.",
+    },
   },
   {
     id: "d1-1",
-    title: "Bubnovačka s Rytmikou",
+    title: {
+      sk: "Otvorenie festivalu a bubnovačka s Rytmikou",
+      en: "Festival opening & drumming with Rytmika",
+    },
     day: 1,
     startTime: "19:30",
     endTime: "20:30",
     category: "music",
     location: "mainStage",
-    description:
-      "Festival otvoríme spolu s Rytmikou, na konci môžete bubnovať spolu s nami.",
+    description: {
+      sk: "Festival otvoríme spolu s Rytmikou, na konci môžete bubnovať spolu s nami.",
+      en: "We'll open the festival together with Rytmika — at the end you can drum along with us.",
+    },
     link: "https://rytmika.sk/",
   },
   {
     id: "d1-2",
-    title: "Open Mic a Karaoke",
+    title: { sk: "Open Mic a Karaoke", en: "Open Mic & Karaoke" },
     day: 1,
     startTime: "21:00",
     endTime: "23:00",
@@ -75,7 +83,7 @@ export const program: ProgramItem[] = [
   },
   {
     id: "d1-3",
-    title: "Vatra",
+    title: { sk: "Vatra", en: "Bonfire" },
     day: 1,
     startTime: "21:00",
     endTime: "22:30",
@@ -84,10 +92,10 @@ export const program: ProgramItem[] = [
   },
   {
     id: "d1-4",
-    title: "DJ Robson",
+    title: { sk: "DJ Robson", en: "DJ Robson" },
     day: 1,
-    startTime: "23:00",
-    endTime: "00:00",
+    startTime: "23:30",
+    endTime: "03:00",
     category: "music",
     location: "mainStage",
   },
@@ -95,7 +103,7 @@ export const program: ProgramItem[] = [
   // Day 2 — Saturday
   {
     id: "d2-1",
-    title: "Jóga s Jankou - začiatočníci",
+    title: { sk: "Jóga s Jankou - začiatočníci", en: "Yoga with Janka - Beginners" },
     day: 2,
     startTime: "09:00",
     endTime: "10:00",
@@ -103,7 +111,10 @@ export const program: ProgramItem[] = [
   },
   {
     id: "d2-2",
-    title: "Jóga s Jankou - mierne pokročilí",
+    title: {
+      sk: "Jóga s Jankou - mierne pokročilí",
+      en: "Yoga with Janka - Intermediate",
+    },
     day: 2,
     startTime: "10:00",
     endTime: "11:00",
@@ -111,7 +122,7 @@ export const program: ProgramItem[] = [
   },
   {
     id: "d2-3",
-    title: "Surfskate lekcia 1",
+    title: { sk: "Surfskate lekcia 1", en: "Surfskate Lesson 1" },
     day: 2,
     startTime: "15:15",
     endTime: "16:30",
@@ -121,18 +132,21 @@ export const program: ProgramItem[] = [
   },
   {
     id: "d2-4",
-    title: "Animal Flow",
+    title: { sk: "Animal Flow", en: "Animal Flow" },
     day: 2,
     startTime: "17:00",
     endTime: "19:00",
     category: "music",
-    description: "The biggest act of the weekend.",
+    description: {
+      sk: "Najväčší headliner víkendu.",
+      en: "The biggest act of the weekend.",
+    },
   },
 
   // Day 3 — Sunday
   {
     id: "d3-1",
-    title: "Vítanie Slnka",
+    title: { sk: "Vítanie Slnka", en: "Sun Salutation" },
     day: 3,
     startTime: "5:00",
     endTime: "6:00",

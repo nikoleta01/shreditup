@@ -1,7 +1,12 @@
+"use client";
+
+import { useLang } from "@/components/language-provider";
 import type { ProgramItem } from "@/lib/data";
 
 export function ProgramTitle({ p }: { p: ProgramItem }) {
-  if (!p.link) return <>{p.title}</>;
+  const { tr } = useLang();
+  const title = tr(p.title);
+  if (!p.link) return <>{title}</>;
   return (
     <a
       href={p.link}
@@ -9,7 +14,7 @@ export function ProgramTitle({ p }: { p: ProgramItem }) {
       rel="noopener noreferrer"
       className="no-underline transition-opacity active:opacity-60"
     >
-      {p.title}
+      {title}
     </a>
   );
 }

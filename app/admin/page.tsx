@@ -54,7 +54,7 @@ export default async function AdminPage() {
       return {
         id: a.id,
         capacity: a.capacity,
-        title: item?.title ?? a.id,
+        title: item?.title.sk ?? a.id,
         day: item?.day,
         startTime: item?.startTime,
         participants: ((allRegs ?? []) as Registration[])

@@ -6,12 +6,14 @@ import { translations, type Lang, type Translations } from '@/lib/i18n'
 type LangContextType = {
   lang: Lang
   t: Translations
+  tr: (m: { sk: string; en: string }) => string
   setLang: (l: Lang) => void
 }
 
 const LangContext = createContext<LangContextType>({
   lang: 'sk',
   t: translations.sk,
+  tr: (m) => m.sk,
   setLang: () => {},
 })
 
@@ -30,7 +32,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <LangContext.Provider value={{ lang, t: translations[lang], setLang }}>
+    <LangContext.Provider
+      value={{ lang, t: translations[lang], tr: (m) => m[lang], setLang }}
+    >
       {children}
     </LangContext.Provider>
   )
