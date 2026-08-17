@@ -86,12 +86,20 @@
   --primary-foreground:  var(--ink);
   --secondary:           var(--pink);
   --secondary-foreground: var(--ink);
-  /* Location chips. Pink is the default; bonfire is the one exception for now.
-     If the colour coding scheme changes, this is the place to redo it. */
-  --chip:                var(--pink);
-  --chip-foreground:     #000000;
-  --chip-bonfire:            #c93d26;
-  --chip-bonfire-foreground: #ffffff;
+  /* Location chips. Grey is the default (no / unmapped location); every named
+     location below is an exception. Update the colour scheme here. */
+  --chip:                #6b7280;
+  --chip-foreground:     #ffffff;
+  --chip-mainstage:            var(--pink);
+  --chip-mainstage-foreground: #000000;
+  --chip-campfire:            #c93d26;
+  --chip-campfire-foreground: #ffffff;
+  --chip-meadow:            var(--olive);
+  --chip-meadow-foreground: #ffffff;
+  --chip-skatewave:            #0ea5e9;
+  --chip-skatewave-foreground: #000000;
+  --chip-skatepark:            #7c3aed;
+  --chip-skatepark-foreground: #ffffff;
   --muted:              var(--surface-tint);
   --muted-foreground:    oklch(0.40 0.045 42);
   --accent:              var(--pink);

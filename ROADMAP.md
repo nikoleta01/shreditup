@@ -11,70 +11,89 @@
 - "Moje aktivity" nav item (was: Registrácia na aktivity)
 - Wave chip component for artist names
 - Admin view — password-protected `/admin` page showing registrations per activity, with per-activity CSV export (`admin_auth` cookie + `ADMIN_PASSWORD`)
-- Venue map (2026-07-23) — replaced the hand-drawn SVG schematic with a real satellite base (`public/map.jpeg`, ~380 KB) and 17 tappable POI pins (entrance, main stage, skate wave, tents ×4, yoga, restaurant, food truck, toilets, showers, bonfire, volleyball, P1/P2/pozdĺžne parking). Pins are percentage coords in `lib/map-pois.ts`; tap-to-place tool at `/map?place=1` (`components/venue-map-editor.tsx`) captures new coords. SK/EN legend, deduped by type. (An illustrated SVG variant + view toggle were prototyped and then dropped — satellite-only by choice.)
+- Per-lesson activity ids + group limit (2026-07-30) — every bookable lesson had been copy-pasted the same `activityId`, so all four shared one capacity pool, one registration marked them all taken, and "Moje aktivity" showed the wrong lesson. Each now has its own UUID and capacity (wave lessons 5, surfskate 24), fixed in `lib/data.ts` and migration `20260730120100_seed_lesson_activities.sql`. New `activities.group_key` (`wave` / `skatepark`) caps a user at one lesson per group for the whole festival, enforced by a partial unique index on `activity_registrations (user_id, group_key)` — not a check inside the function, which the row lock cannot make safe against two concurrent taps on sibling slots. `register_for_activity()` returns a new `group_taken` error. The registration's `group_key` is set by trigger from the activity, never by the caller: a caller-supplied NULL would sit outside the partial index and slip past the rule.
+- Registration RLS hardened (2026-07-30) — the `own registrations only` policy was `FOR ALL`, so any authenticated client could `insert` straight into `activity_registrations` and skip the capacity check entirely. Split into read-own + delete-own; inserts now only go through the `SECURITY DEFINER` function. Verified: direct insert, full-lesson insert and slot-swapping update are all rejected for the `authenticated` role, while read/unregister/RPC still work.
+- Grouped lesson cards in the program (2026-07-30) — repeating lessons no longer get one row each. `slotGroup` on a `ProgramItem` folds it into a `SLOT_GROUPS` card (`lib/data.ts`), and `getProgramEntriesByDay()` returns items and groups interleaved in time order. Saturday went from 7 rows to 5 and stays at 5 as the remaining ~13 lessons are added — the card just grows chips. Booking one chip dims its siblings, which is the `group_key` rule made visible instead of surfacing as an error. The timetable renders one block per series via `getTimetableItemsByDay()`, which also avoids its `MAX_LEVELS = 3` stagger cap collapsing concurrent slots onto each other.
+- Wave lessons, full Saturday schedule (2026-07-30) — 9 slots: three 20-minute ones from 09:30, then pairs of 30-minute ones from 11:00, 13:00 and 14:30. Capacity 5 each, all in the `wave` group → 45 people can ride, one lesson per person. Durations differ per slot and live in `lib/data.ts`; only capacity + group are in the DB (`20260730150000_wave_lessons_round_two.sql`). The timetable splits a group into **contiguous runs** rather than one block: with gaps at 12:00–13:00 and 14:00–14:30, a single block would have claimed six solid hours. Falls out as four clean 1-hour blocks — computed from the slots, not hardcoded, so a future 40-minute or 90-minute run stays honest.
+- Remaining-spots display (2026-07-30) — `activities.registrations_count`, maintained by an `after insert/delete/update` trigger and backfilled on migration. Chips show `3 voľné miesta` / `PLNÉ` and full slots are disabled. Two things worth remembering: (1) the browser **cannot** count `activity_registrations` itself — RLS narrows it to the caller's own rows — so the count has to be denormalised onto `activities`; (2) the `activities are public` policy was `TO authenticated`, and since anonymous sign-in is lazy, capacity was invisible until *after* the user tapped the button it was meant to inform. Policy now covers `anon` too. Verified anon reads capacity but still sees zero rows of `activity_registrations` and `profiles`. `register_for_activity()` deliberately still counts rows under the lock — the column is display only, never enforcement.
+- Venue map (2026-07-23) — replaced the hand-drawn SVG schematic with a real satellite base (`public/map.jpeg`, ~380 KB) and 17 tappable POI pins (entrance, main stage, skate wave, tents ×4, yoga, restaurant, food truck, toilets, showers, campfire, volleyball, P1/P2/pozdĺžne parking). Pins are percentage coords in `lib/map-pois.ts`; tap-to-place tool at `/map?place=1` (`components/venue-map-editor.tsx`) captures new coords. SK/EN legend, deduped by type. (An illustrated SVG variant + view toggle were prototyped and then dropped — satellite-only by choice.) Map container reserves the image aspect ratio (1671×1205) so pins no longer collapse into one line before the JPEG decodes; skeleton pulse + fade-in while loading.
 
 ---
 
 ## 🔧 In Progress / Next Up
 
-### Unregister from activity
-Allow users to cancel their registration for a workshop or lesson.
-- Add "Odhlásiť sa" button on the program card (when registered)
-- Delete row from `activity_registrations`
-- Same race condition safety is not needed for unregister (deleting is always safe)
+### Switch slots / unregister from the program page
+
+**Status correction:** unregistering already works — `app/registration/page.tsx` has the "Odhlásiť sa" button and deletes from `activity_registrations`, and the count trigger decrements correctly. What's missing is doing it from the **program page**, which the one-per-group rule made important:
+
+- A user who books 09:30 and then wants 10:10 gets `group_taken` and has to go to Aktivity, unregister, come back, re-book. Four steps to change their mind — and changing your mind is more common than hitting a full lesson.
+- Fix: tapping a different chip in a group you already hold opens a "Prepnúť na 10:10?" confirm that unregisters and re-registers in one go, instead of the current dead disabled state.
+- Race safety: the delete is always safe, but the re-register can fail (someone took the spot in between). Don't drop the original booking until the new one succeeds, or the user ends up with neither.
+- Also add plain "Odhlásiť sa" to the program card so the two pages agree.
 
 ### Finish i18n coverage — my follow-ups after the title-translation ticket
-**Context:** A colleague is making program *titles* bilingual (`title: { sk, en }` in `lib/data.ts`, resolved in the `/program` list and `/timetable` grid). These are the pieces I'm keeping for myself, to do after that lands.
-- **Push notifications (cron):** `app/api/cron/route.ts` sends `item.title` verbatim in the reminder. Once titles are `{ sk, en }`, decide which language to send *and* translate the notification copy itself. Push has no per-user language yet — either default to SK or store a lang preference per subscription. (The colleague will leave the cron route defaulting to `.sk` just so it compiles.)
-- **Program descriptions:** make `description` bilingual with the same pattern. It's optional — not every item has one — so the resolver must handle a missing value.
-- **"Moje aktivity" activity names:** that page (`app/registration/page.tsx`) reads `activities.name` from Supabase, NOT from `lib/data.ts`, so the title translation doesn't reach it. Preferred fix (no DB migration): the row and the static item are already linked by `activityId`, so look up the matching program item and show its `title[lang]` instead of the raw DB `name`. (Alternative = add a `name_en` column via a Supabase migration + backfill — more work, skip unless there's a reason.)
+
+**Context:** program _titles_ are bilingual (`title: { sk, en }` in `lib/data.ts`, resolved in the `/program` list and `/timetable` grid). These were the follow-ups; two are now done.
+
+- ✅ **Program descriptions** — `description` is `{ sk, en }` and resolved through `tr()`, which handles the optional case. Slot-group descriptions in `SLOT_GROUPS` follow the same shape.
+- ✅ **"Moje aktivity" activity names** — no longer reads `activities.name` (that column was dropped in `20260714010000_slim_activities.sql`). The page resolves everything through `getRegisterableActivity(activityId)` and `tr(item.title)`, so translations reach it. No `name_en` column needed.
+- ⬜ **Push notifications (cron)** — still open. `app/api/cron/route.ts:41` sends `item.title.sk` verbatim. The body is already bilingual (`O 30 minút začína · Starting in 30 min · HH:MM`), so only the title is single-language. Push has no per-user language — either keep SK, mirror the body's dual-language style, or store a lang preference per subscription.
+- ⬜ **Registration error copy** — the `full` / `already_registered` / `group_taken` / generic messages in `app/program/page.tsx` are hardcoded SK, as is the `GROUP_LABEL` map and the register/confirm button text. Move to `lib/i18n.ts` when this section is finished; left as-is deliberately so the block stays consistent rather than half-translated.
 
 ---
 
 ## 📋 Planned
 
 ### Waitlist with push notification when a spot frees up
-**Context:** When a workshop (e.g. Surfskate lekcia, capacity 20) is full, users should be able to join a waitlist. When someone cancels their registration, the next person in the waitlist gets a push notification: "Uvoľnilo sa miesto na [activity] — registruj sa kým môžeš!"
+
+**Context:** When a lesson is full, users should be able to join a waitlist. When someone cancels, the next person in line gets a push notification: "Uvoľnilo sa miesto na [activity] — registruj sa kým môžeš!"
+
+This got more valuable, and it now has somewhere to live. The wave lessons hold **5 people each — 15 spots across the three slots for the whole festival**, and the group rule means one booking per person, so most attendees will find them full with nothing else to try. The chips already render a disabled `PLNÉ` state; a waitlist button belongs exactly there, turning a dead end into an action. (Surfskate at 24 is far less likely to need it.)
 
 **What's needed:**
+
 - `waitlist` table: `id`, `user_id`, `activity_id`, `position`, `created_at`
+- Respect `group_key`: a person already holding a wave lesson shouldn't waitlist another one, and being promoted must not break the one-per-group rule
 - DB trigger on DELETE from `activity_registrations` → check if waitlist has entries for that activity → send push notification to the first person in line
 - Push notification already has infrastructure (VAPID keys, service worker, subscribe/unsubscribe endpoints) — just needs to be wired to the trigger
 - Race condition still applies: if 3 people are notified and only 1 spot is free, the Postgres `register_for_activity` function already handles this — first one in wins, others get "full" error
 - RLS policy: users can only see their own waitlist entry
 - UI: "Pridať na čakaciu listinu" button when workshop is full, "Si na čakacej listine" state
 
-### Real-time capacity display
-**Context:** Show remaining spots per activity (e.g. "7 miest zostáva") that updates live as people register/cancel — even across different devices.
+### Real-time capacity display — _live sync only; the numbers themselves are done_
 
-**What's needed:**
-- `registrations_count` column on `activities` table (maintained by DB trigger on INSERT/DELETE to `activity_registrations`)
-- Enable Supabase Realtime on `activities` table
-- Client subscribes to `activities` Realtime channel and updates displayed count on change
-- Disable "Zaregistrovať sa" button when `registrations_count >= capacity`
-- Note: enforcement is already bulletproof at DB level regardless of whether this is built
+Counts, "PLNÉ", and disabled full buttons shipped 2026-07-30 (see Done). What's left is only the **live** part — a count changing on your screen because someone else registered on their phone:
+
+- Enable Supabase Realtime on `activities` (`alter publication supabase_realtime add table activities`)
+- Client subscribes to the `activities` channel and updates the `availability` map in `app/program/page.tsx` on change
+- Today the count is correct on every page load and after your own registration (updated locally); it goes stale only if you sit on the page while others book
+- Worth it mainly for the wave lessons, where 5 spots across 3 slots can empty during the time someone spends deciding
 
 ### "Moje aktivity" page — personal schedule
-**Context:** The `/registration` page currently shows all activities. Long-term vision: show the user's own registrations as a personal schedule/harmonogram. Useful reminder during the festival ("what did I sign up for and when?").
 
-**What's needed:**
-- Fetch only the user's registrations from `activity_registrations`
-- Join with `activities` table to show name, day, time
-- Simple list grouped by day
+**Status correction:** the old note said "`/registration` currently shows all activities" — it doesn't, and hasn't since the slim-activities migration. The page already fetches only the user's own registrations, resolves title/day/time from `lib/data.ts` via `getRegisterableActivity()`, sorts by day then start time, and has an empty state. Effectively done.
+
+Remaining polish, if wanted:
+
+- Visually group by day with headers rather than only sorting by it
+- Show `endTime` alongside `startTime` (only the start is displayed today), which matters now that wave slots are 20 minutes long
 - Empty state: "Zatiaľ nie si prihlásený/á na žiadnu aktivitu"
 
 ### Photo wall — community photos projected at the festival
+
 **Context:** A projector (pointed at a bedsheet/screen at the venue) displays a live slideshow of photos contributed by attendees. Attendees upload via a QR code on a physical poster — **the upload page is intentionally NOT in the app menu**, to keep the app's everyday face minimal (program, quick glance, done) and avoid pulling people onto their phones. Every photo is moderated before it appears: nothing goes public without admin approval. Admin (Nikoleta) approves from the registration desk during the festival.
 
 **Design principles (do not violate):**
+
 - **No engagement mechanics** — no likes, no comments, no "your photo is live" notifications. Upload-and-forget, one-way street. This is deliberate: the feature must reinforce "be present," not become an attention loop.
 - **Default-private** — `status = 'pending'` on upload, private bucket. Public requires an explicit admin approve. The DB default is the safety guarantee.
 - **Wall is a look-up experience** — its home is the projector, not anyone's phone. Hidden from the menu.
 
 **What's needed:**
+
 - **DB:** `photos` table — `id`, `user_id` (→ `profiles`, for attribution; name only, no email), `storage_path`, `status` (`pending`|`approved`|`rejected`), `is_seed` (bool), `created_at`, `approved_at`. RLS: only service-role (admin) reads pending photos.
 - **Storage:** private Supabase Storage bucket `photos`. Free tier is sufficient (1 GB ≈ 2,500 resized photos; 5 GB/mo egress easily covers one projector). Optionally upgrade to Pro ($25) for the festival month only — removes the 1-week inactivity pause risk and adds headroom; cancel after.
-- **Resize on upload** — downscale to ~1600px long edge (~400 KB) in the upload API route with `sharp` *before* storing. This is the main storage/egress lever (5–10× more photos per GB). Do NOT use Supabase's built-in image transformation (Pro-only, paid) — resize ourselves.
+- **Resize on upload** — downscale to ~1600px long edge (~400 KB) in the upload API route with `sharp` _before_ storing. This is the main storage/egress lever (5–10× more photos per GB). Do NOT use Supabase's built-in image transformation (Pro-only, paid) — resize ourselves.
 - **Upload page** (`/upload` or similar, unlinked): logged-in profile (reuse lazy anonymous auth) → pick photo → resize → upload to private bucket → insert `pending` row tied to `user_id`.
 - **Admin approval:** new block on `/admin` (reuse existing `admin_auth` cookie / `ADMIN_PASSWORD`, same per-route pattern as the CSV export). Thumbnails of `pending` photos with Approve / Reject. Approve → `status = 'approved'` + `approved_at`. Reject → delete file + row.
 - **Wall page** (`/wall`, NOT in menu, bookmarked on the projector laptop): full-screen auto-advancing slideshow with cross-fade. Polls an API every ~5s for `approved` photos (polling chosen over Realtime — survives flaky festival wifi, "appears within 5s" reads as real-time to a crowd). Protect with a `?key=` token so a random person can't pull up the feed.

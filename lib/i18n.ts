@@ -18,7 +18,9 @@ export const translations = {
     locations: {
       mainStage: "Hlavný stage",
       skatepark: "Skatepark",
-      bonfire: "Ohnisko",
+      campfire: "Ohnisko",
+      meadow: "Festivalová Lúka",
+      skateWave: "Skate vlna",
     } satisfies Record<LocationKey, string>,
     install: {
       title: "Pridaj na plochu",
@@ -38,6 +40,7 @@ export const translations = {
     },
     notifyBefore: "O 30 minút začína",
     noRegistration: "Bez registrácie",
+    full: "PLNÉ",
   },
   en: {
     program: "Program",
@@ -54,7 +57,9 @@ export const translations = {
     locations: {
       mainStage: "Main Stage",
       skatepark: "Skatepark",
-      bonfire: "Campfire",
+      campfire: "Campfire",
+      meadow: "Festival Meadow",
+      skateWave: "Skate Wave",
     } satisfies Record<LocationKey, string>,
     install: {
       title: "Add to Home Screen",
@@ -74,7 +79,17 @@ export const translations = {
     },
     notifyBefore: "Starting in 30 minutes",
     noRegistration: "No registration",
+    full: "FULL",
   },
 } satisfies Record<Lang, unknown>;
 
 export type Translations = (typeof translations)[Lang];
+
+// Slovak counts in three forms — 1 miesto, 2-4 miesta, 5+ miest — so this can't
+// be a plain string in the table above.
+export function spotsLeft(n: number, lang: Lang): string {
+  if (lang === "en") return n === 1 ? "1 spot left" : `${n} spots left`;
+  if (n === 1) return "1 voľné miesto";
+  if (n < 5) return `${n} voľné miesta`;
+  return `${n} voľných miest`;
+}

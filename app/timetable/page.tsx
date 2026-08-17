@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { getProgramByDay, type Category, type ProgramItem } from "@/lib/data";
+import { getTimetableItemsByDay, type ProgramItem } from "@/lib/data";
 import { useLang } from "@/components/language-provider";
 import { DayTabs } from "@/components/day-tabs";
+import { CHIP_TONE, toneForLocation } from "@/lib/location-chip";
 
 const SLOT_HEIGHT = 60;
 
@@ -22,15 +23,6 @@ function dayWindow(items: ProgramItem[]) {
   const endHour = Math.ceil(Math.max(...items.map(endMinutes)) / 60);
   return { startHour, endHour };
 }
-
-// Each event type maps to a token from the poster palette. These three colors
-// are designed to coexist, so categories stay distinguishable at a glance.
-const CATEGORY_COLOR: Record<Category, string> = {
-  music: "var(--secondary)", // pink
-  workshop: "var(--card)", // blue
-  registration: "var(--primary)", // olive
-  info: "var(--muted)",
-};
 
 function endMinutes(p: ProgramItem) {
   const s = timeToMinutes(p.startTime);
@@ -90,6 +82,9 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
     ? t.locations[p.location]
     : `${p.startTime}–${p.endTime}`;
 
+  // Colour the block by its location, matching the location chips exactly.
+  const colors = CHIP_TONE[toneForLocation(p.location)];
+
   return (
     <div
       className="absolute overflow-hidden rounded-sm border-2 border-foreground px-2 py-1"
@@ -99,19 +94,18 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
         left: `calc(${p.left * 100}% + 2px)`,
         width: `calc(${p.width * 100}% - 4px)`,
         zIndex: p.z,
-        backgroundColor: p.category
-          ? CATEGORY_COLOR[p.category]
-          : "var(--muted)",
+        backgroundColor: colors.backgroundColor,
+        color: colors.color,
       }}
     >
       <p
-        className="truncate text-xs font-bold leading-tight text-foreground"
+        className="truncate text-xs font-bold leading-tight"
         style={{ fontFamily: "var(--font-barlow-condensed)" }}
       >
         {tr(p.title)}
       </p>
       <p
-        className="truncate text-[10px] text-foreground/60"
+        className="truncate text-[10px] opacity-75"
         style={{ fontFamily: "var(--font-barlow-condensed)" }}
       >
         {subtitle}
@@ -127,7 +121,7 @@ function DayTimetable({
   day: 1 | 2 | 3;
   stageName: string;
 }) {
-  const laid = layoutDay(getProgramByDay(day));
+  const laid = layoutDay(getTimetableItemsByDay(day));
   const { startHour, endHour } = dayWindow(laid);
   const gridHeight = (endHour - startHour) * SLOT_HEIGHT;
   const labels = Array.from(
