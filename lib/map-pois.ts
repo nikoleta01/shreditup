@@ -9,7 +9,7 @@ export type PoiTypeId =
   | "foodTruck"
   | "toilets"
   | "showers"
-  | "bonfire"
+  | "campfire"
   | "volleyball"
   | "paddle"
   | "parkingP2"
@@ -86,10 +86,10 @@ export const POI_TYPES: PoiType[] = [
   },
   { id: "showers", emoji: "🚿", sk: "Sprchy", en: "Showers", color: "#0d9488" },
   {
-    id: "bonfire",
+    id: "campfire",
     emoji: "🔥",
     sk: "Ohnisko",
-    en: "Bonfire",
+    en: "Campfire",
     color: "#e11d48",
   },
   {
@@ -145,7 +145,7 @@ export const MAP_POIS: MapPoi[] = [
   { type: "foodTruck", x: 45.98, y: 33.01 },
   { type: "toilets", x: 43.08, y: 13.57 },
   { type: "showers", x: 37.28, y: 14.5 },
-  { type: "bonfire", x: 18, y: 38.56 },
+  { type: "campfire", x: 18, y: 38.56 },
   { type: "volleyball", x: 53.57, y: 86.06 },
   { type: "paddle", x: 95.54, y: 91 },
   { type: "parkingP2", x: 57.8, y: 4.2 },

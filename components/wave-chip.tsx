@@ -1,13 +1,4 @@
-const TONES = {
-  default: {
-    backgroundColor: "var(--chip)",
-    color: "var(--chip-foreground)",
-  },
-  bonfire: {
-    backgroundColor: "var(--chip-bonfire)",
-    color: "var(--chip-bonfire-foreground)",
-  },
-} as const;
+import { CHIP_TONE, type ChipTone } from "@/lib/location-chip";
 
 export function WaveChip({
   children,
@@ -16,7 +7,7 @@ export function WaveChip({
 }: {
   children: React.ReactNode;
   className?: string;
-  tone?: keyof typeof TONES;
+  tone?: ChipTone;
 }) {
   return (
     <span
@@ -25,7 +16,7 @@ export function WaveChip({
       }`}
       style={{
         fontFamily: "var(--font-barlow-condensed)",
-        ...TONES[tone],
+        ...CHIP_TONE[tone],
       }}
     >
       {children}

@@ -2,53 +2,94 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getProgramByDay, type ProgramItem } from "@/lib/data";
+import {
+  getProgramEntriesByDay,
+  type ProgramEntry,
+  type ProgramItem,
+} from "@/lib/data";
 import { useLang } from "@/components/language-provider";
+import { spotsLeft } from "@/lib/i18n";
 import { DayTabs } from "@/components/day-tabs";
 import { WaveChip } from "@/components/wave-chip";
+import { toneForLocation } from "@/lib/location-chip";
 import { ProgramTitle } from "@/components/program-title";
 import { ensureAnonymousSession, getSupabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
 type Profile = { first_name: string; last_name: string };
 
+type ActivityRow = {
+  id: string;
+  capacity: number;
+  registrations_count: number;
+};
+
+// How full each registerable activity is, keyed by activityId. Counts come from
+// activities.registrations_count (a trigger-maintained column) because RLS stops
+// the browser counting activity_registrations itself.
+type Availability = Map<string, { capacity: number; count: number }>;
+
 type Modal =
   | { type: "confirm"; activityId: string; activityName: string }
   | { type: "name-form"; activityId: string; activityName: string };
 
+// Mirrors activities.group_key in the DB. One registration per group per person
+// for the whole festival, so the slots spread across as many people as possible.
+const GROUP_LABEL: Record<string, string> = {
+  wave: "lekciu na vlne",
+  skatepark: "lekciu v skateparku",
+};
+
+function TimeColumn({
+  startTime,
+  endTime,
+}: {
+  startTime: string;
+  endTime: string;
+}) {
+  return (
+    <div className="flex w-14 shrink-0 flex-col items-end pt-0.5">
+      <span
+        className="text-sm font-bold tabular-nums text-black"
+        style={{
+          fontFamily: "var(--font-barlow-condensed)",
+          textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
+        }}
+      >
+        {startTime}
+      </span>
+      <span
+        className="text-xs tabular-nums text-black"
+        style={{
+          fontFamily: "var(--font-barlow-condensed)",
+          textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
+        }}
+      >
+        {endTime}
+      </span>
+    </div>
+  );
+}
+
 function ProgramCard({
   p,
   registered,
+  availability,
   onRegister,
 }: {
   p: ProgramItem;
   registered: boolean;
+  availability: Availability;
   onRegister: (activityId: string, activityName: string) => void;
 }) {
-  const { t, tr } = useLang();
+  const { t, tr, lang } = useLang();
   const title = tr(p.title);
+  const seat = p.activityId ? availability.get(p.activityId) : undefined;
+  const left = seat ? Math.max(seat.capacity - seat.count, 0) : null;
+  const isFull = left === 0 && !registered;
   return (
     <div className="flex gap-4 py-4">
-      <div className="flex w-14 shrink-0 flex-col items-end pt-0.5">
-        <span
-          className="text-sm font-bold tabular-nums text-black"
-          style={{
-            fontFamily: "var(--font-barlow-condensed)",
-            textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
-          }}
-        >
-          {p.startTime}
-        </span>
-        <span
-          className="text-xs tabular-nums text-black"
-          style={{
-            fontFamily: "var(--font-barlow-condensed)",
-            textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
-          }}
-        >
-          {p.endTime}
-        </span>
-      </div>
+      <TimeColumn startTime={p.startTime} endTime={p.endTime} />
       <div className="flex-1 space-y-1 pb-1">
         <div>
           <h3
@@ -62,7 +103,7 @@ function ProgramCard({
               {p.location && (
                 <WaveChip
                   className="text-xs"
-                  tone={p.location === "bonfire" ? "bonfire" : "default"}
+                  tone={toneForLocation(p.location)}
                 >
                   {t.locations[p.location]}
                 </WaveChip>
@@ -91,13 +132,24 @@ function ProgramCard({
                 Prihlásený/á ✓
               </span>
             ) : (
-              <button
-                onClick={() => onRegister(p.activityId!, title)}
-                className="border-2 border-foreground bg-foreground px-3 py-1 text-xs font-bold text-background transition-colors hover:bg-transparent hover:text-foreground"
-                style={{ fontFamily: "var(--font-barlow-condensed)" }}
-              >
-                Zaregistrovať sa
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  disabled={isFull}
+                  onClick={() => onRegister(p.activityId!, title)}
+                  className="border-2 border-foreground bg-foreground px-3 py-1 text-xs font-bold text-background transition-colors hover:bg-transparent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-foreground disabled:hover:text-background"
+                  style={{ fontFamily: "var(--font-barlow-condensed)" }}
+                >
+                  Zaregistrovať sa
+                </button>
+                {left !== null && (
+                  <span
+                    className="text-xs font-bold uppercase tracking-wide text-foreground/60"
+                    style={{ fontFamily: "var(--font-barlow-condensed)" }}
+                  >
+                    {isFull ? t.full : spotsLeft(left, lang)}
+                  </span>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -106,12 +158,103 @@ function ProgramCard({
   );
 }
 
+// One card for a whole lesson series. The slots become time chips rather than
+// rows: eighteen program points on Saturday is unreadable, and the eight wave
+// slots are one offering with eight openings, not eight things to attend.
+// Booking one dims the rest, which is the one-per-group rule shown rather than
+// explained — the DB still rejects it either way.
+function LessonGroupCard({
+  entry,
+  registeredIds,
+  availability,
+  onRegister,
+}: {
+  entry: Extract<ProgramEntry, { kind: "group" }>;
+  registeredIds: Set<string>;
+  availability: Availability;
+  onRegister: (activityId: string, activityName: string) => void;
+}) {
+  const { t, tr, lang } = useLang();
+  const { group, slots, startTime, endTime } = entry;
+  const booked = slots.find(
+    (s) => s.activityId && registeredIds.has(s.activityId),
+  );
+
+  return (
+    <div className="flex gap-4 py-4">
+      <TimeColumn startTime={startTime} endTime={endTime} />
+      <div className="flex-1 space-y-1 pb-1">
+        <h3
+          className="text-base font-bold leading-tight text-foreground"
+          style={{ fontFamily: "var(--font-barlow-condensed)" }}
+        >
+          {tr(group.title)}
+        </h3>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <WaveChip className="text-xs" tone={toneForLocation(group.location)}>
+            {t.locations[group.location]}
+          </WaveChip>
+        </div>
+        <p className="text-sm text-foreground/85">{tr(group.description)}</p>
+
+        <div className="flex flex-wrap gap-2 pt-2">
+          {slots.map((slot) => {
+            if (!slot.activityId) return null;
+            const isBooked = booked?.id === slot.id;
+            const seat = availability.get(slot.activityId);
+            const left = seat ? Math.max(seat.capacity - seat.count, 0) : null;
+            const isFull = left === 0 && !isBooked;
+            // Already holding a slot in this group blocks the siblings — the
+            // DB rejects a second one, so don't offer the tap.
+            const blocked = (!!booked && !isBooked) || isFull;
+            return (
+              <button
+                key={slot.id}
+                disabled={blocked}
+                aria-pressed={isBooked}
+                onClick={() => onRegister(slot.activityId!, tr(slot.title))}
+                className={`flex flex-col items-center border-2 border-foreground px-2.5 py-1 transition-colors ${
+                  isBooked
+                    ? "bg-foreground text-background"
+                    : blocked
+                      ? "cursor-not-allowed text-foreground/40 opacity-50"
+                      : "text-foreground hover:bg-foreground hover:text-background"
+                }`}
+                style={{ fontFamily: "var(--font-barlow-condensed)" }}
+              >
+                <span className="text-xs font-bold tabular-nums">
+                  {slot.startTime}–{slot.endTime}
+                  {isBooked && " ✓"}
+                </span>
+                {left !== null && !isBooked && (
+                  <span className="text-[10px] font-bold uppercase tracking-wide opacity-75">
+                    {isFull ? t.full : spotsLeft(left, lang)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {booked && (
+          <p
+            className="pt-1 text-xs font-bold text-foreground/85"
+            style={{ fontFamily: "var(--font-barlow-condensed)" }}
+          >
+            Prihlásený/á · {booked.startTime}–{booked.endTime}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProgramPage() {
-  const { t } = useLang();
   const [activeDay, setActiveDay] = useState<1 | 2 | 3>(1);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
+  const [availability, setAvailability] = useState<Availability>(new Map());
   const [modal, setModal] = useState<Modal | null>(null);
   const [nameForm, setNameForm] = useState({ first_name: "", last_name: "" });
   const [submitting, setSubmitting] = useState(false);
@@ -120,6 +263,21 @@ export default function ProgramPage() {
   useEffect(() => {
     async function init() {
       const supabase = getSupabase();
+
+      // Before the session check: capacity is readable by `anon` too, and the
+      // numbers have to be on screen before the tap that creates a session.
+      const { data: acts } = await supabase
+        .from("activities")
+        .select("id, capacity, registrations_count");
+      setAvailability(
+        new Map(
+          (acts ?? []).map((a: ActivityRow) => [
+            a.id,
+            { capacity: a.capacity, count: a.registrations_count },
+          ]),
+        ),
+      );
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -219,6 +377,14 @@ export default function ProgramPage() {
       return;
     }
 
+    if (result?.error === "group_taken") {
+      setError(
+        `Už si prihlásený/á na ${GROUP_LABEL[result.group] ?? "takúto lekciu"}. Aby sa dostalo na čo najviac ľudí, môžeš mať iba jednu — najprv sa odhlás v Aktivitách.`,
+      );
+      setSubmitting(false);
+      return;
+    }
+
     if (result?.error) {
       setError("Registrácia zlyhala. Skús znova.");
       setSubmitting(false);
@@ -226,6 +392,13 @@ export default function ProgramPage() {
     }
 
     setRegisteredIds((prev) => new Set([...prev, activityId]));
+    setAvailability((prev) => {
+      const seat = prev.get(activityId);
+      if (!seat) return prev;
+      const next = new Map(prev);
+      next.set(activityId, { ...seat, count: seat.count + 1 });
+      return next;
+    });
     setModal(null);
     setSubmitting(false);
   }
@@ -264,14 +437,28 @@ export default function ProgramPage() {
         </div>
 
         <div className="divide-y-2 divide-foreground/20">
-          {getProgramByDay(activeDay).map((p) => (
-            <ProgramCard
-              key={p.id}
-              p={p}
-              registered={!!p.activityId && registeredIds.has(p.activityId)}
-              onRegister={handleRegisterTap}
-            />
-          ))}
+          {getProgramEntriesByDay(activeDay).map((entry) =>
+            entry.kind === "group" ? (
+              <LessonGroupCard
+                key={entry.key}
+                entry={entry}
+                registeredIds={registeredIds}
+                availability={availability}
+                onRegister={handleRegisterTap}
+              />
+            ) : (
+              <ProgramCard
+                key={entry.key}
+                p={entry.item}
+                registered={
+                  !!entry.item.activityId &&
+                  registeredIds.has(entry.item.activityId)
+                }
+                availability={availability}
+                onRegister={handleRegisterTap}
+              />
+            ),
+          )}
         </div>
       </div>
 
