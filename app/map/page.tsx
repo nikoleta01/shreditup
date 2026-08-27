@@ -6,13 +6,13 @@ export default function MapPage() {
     <div className="mx-auto max-w-md px-4 pt-8">
       <VenueMapEditor />
       <h1
-        className="mb-1 text-4xl leading-tight text-foreground"
-        style={{ fontFamily: 'var(--font-alfa)' }}
+        className="mb-1 text-center text-4xl leading-tight text-foreground"
+        style={{ fontFamily: 'var(--font-geoparody)' }}
       >
         Mapa areálu
       </h1>
       <p
-        className="mb-6 text-sm text-foreground/60"
+        className="mb-6 text-center text-sm text-foreground/60"
         style={{ fontFamily: 'var(--font-barlow-condensed)' }}
       >
         Camping Sereď · Starý Most

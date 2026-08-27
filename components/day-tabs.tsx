@@ -14,8 +14,8 @@ export function DayTabs({ activeDay, onChange }: DayTabsProps) {
     // Full-bleed to the screen edge on mobile (cancels the parent's px-4);
     // sits inside the content column from `sm` up.
     <div className="-mx-4 sm:mx-0">
-      <div className="grid grid-cols-3 rounded-t-sm border-2 border-foreground bg-card">
-        {([1, 2, 3] as const).map((day) => (
+      <div className="grid grid-cols-2 rounded-t-sm border-2 border-foreground bg-card">
+        {([1, 2] as const).map((day) => (
           <button
             key={day}
             onClick={() => onChange(day)}

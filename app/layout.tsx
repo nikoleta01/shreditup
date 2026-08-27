@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Alfa_Slab_One, Barlow, Barlow_Condensed } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
 import { InstallPrompt } from "@/components/install-prompt";
@@ -25,6 +26,13 @@ const barlowCondensed = Barlow_Condensed({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin-ext"],
   variable: "--font-barlow-condensed",
+  display: "swap",
+});
+
+const geoparody = localFont({
+  src: "./fonts/Geoparody-Heavy.otf",
+  weight: "900",
+  variable: "--font-geoparody",
   display: "swap",
 });
 
@@ -62,7 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="sk"
-      className={`${alfaSlabOne.variable} ${barlow.variable} ${barlowCondensed.variable}`}
+      className={`${alfaSlabOne.variable} ${barlow.variable} ${barlowCondensed.variable} ${geoparody.variable}`}
     >
       <body className="flex min-h-svh flex-col bg-background text-foreground antialiased">
         <LanguageProvider>

@@ -31,40 +31,50 @@ function endMinutes(p: ProgramItem) {
   return e;
 }
 
-// A performance with its horizontal placement resolved. Overlapping events
-// don't get separate lanes — they stack on top of each other, each one a bit
-// narrower and nudged right, so you can see the wider blocks peeking behind.
-type LaidOut = ProgramItem & { left: number; width: number; z: number };
-
-const STAGGER = 0.16; // each overlap level insets this fraction from the left
-const MAX_LEVELS = 3; // cap so deeply-overlapped events don't shrink to nothing
+// A performance with its horizontal placement resolved. Overlapping events get
+// their own side-by-side lane. The old layout insets each overlap level from
+// the left and stacked them — but the left edge is exactly where the title
+// sits, so on a 320px screen the block underneath was cut down to "Open M" /
+// "Hlavný s". Lanes cost width but never cover another block's text.
+type LaidOut = ProgramItem & { left: number; width: number };
 
 function layoutDay(items: ProgramItem[]): LaidOut[] {
-  const evs = items.map((p) => ({
-    p,
-    s: timeToMinutes(p.startTime),
-    e: endMinutes(p),
-  }));
-  // Stacking order: earlier events first; ties broken so the longer (container)
-  // event sits underneath.
-  const order = [...evs].sort((a, b) => a.s - b.s || b.e - a.e);
+  const evs = items
+    .map((p) => ({ p, s: timeToMinutes(p.startTime), e: endMinutes(p) }))
+    // Earlier events first; ties broken so the longer event takes the left lane.
+    .sort((a, b) => a.s - b.s || b.e - a.e);
 
-  // Greedy interval-graph coloring: each event takes the lowest level not used
-  // by an already-placed event it overlaps. Two overlapping events therefore
-  // always get different levels, so neither can fully hide the other.
-  const placed: { s: number; e: number; level: number }[] = [];
+  const out: LaidOut[] = [];
+  let cluster: { p: ProgramItem; s: number; e: number; level: number }[] = [];
+  let clusterEnd = -Infinity;
 
-  return order.map((ev) => {
+  // Lane count is per *cluster* of transitively-overlapping events, not per
+  // day: three-deep Saturday mornings must not shrink the lone evening block
+  // to a third of the width.
+  function flush() {
+    if (!cluster.length) return;
+    const lanes = Math.max(...cluster.map((c) => c.level)) + 1;
+    for (const c of cluster) {
+      out.push({ ...c.p, left: c.level / lanes, width: 1 / lanes });
+    }
+    cluster = [];
+  }
+
+  for (const ev of evs) {
+    if (ev.s >= clusterEnd) flush();
+    // Greedy interval-graph colouring: lowest lane not held by an overlapping
+    // event already in this cluster.
     const taken = new Set(
-      placed.filter((o) => o.s < ev.e && ev.s < o.e).map((o) => o.level),
+      cluster.filter((o) => o.s < ev.e && ev.s < o.e).map((o) => o.level),
     );
     let level = 0;
     while (taken.has(level)) level++;
-    placed.push({ s: ev.s, e: ev.e, level });
+    cluster.push({ ...ev, level });
+    clusterEnd = Math.max(clusterEnd, ev.e);
+  }
+  flush();
 
-    const inset = Math.min(level, MAX_LEVELS) * STAGGER;
-    return { ...ev.p, left: inset, width: 1 - inset, z: 10 + level };
-  });
+  return out;
 }
 
 function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
@@ -82,6 +92,13 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
     ? t.locations[p.location]
     : `${p.startTime}–${p.endTime}`;
 
+  // Vertical space goes to the title first. The block is already colour-coded
+  // by location, so the subtitle repeats what the colour says — it only earns
+  // its line once a full hour block (56px) leaves room for both. Below 40px
+  // (a 30-min lesson) there is one line, and it belongs to the title.
+  const titleLines = height >= 40 ? 2 : 1;
+  const showSubtitle = height >= 56;
+
   // Colour the block by its location, matching the location chips exactly.
   const colors = CHIP_TONE[toneForLocation(p.location)];
 
@@ -93,23 +110,34 @@ function ProgramBlock({ p, startHour }: { p: LaidOut; startHour: number }) {
         height,
         left: `calc(${p.left * 100}% + 2px)`,
         width: `calc(${p.width * 100}% - 4px)`,
-        zIndex: p.z,
         backgroundColor: colors.backgroundColor,
         color: colors.color,
       }}
     >
       <p
-        className="truncate text-xs font-bold leading-tight"
-        style={{ fontFamily: "var(--font-barlow-condensed)" }}
+        className="text-xs font-bold leading-tight"
+        style={{
+          fontFamily: "var(--font-barlow-condensed)",
+          // Wrap rather than truncate: in a four-lane cluster at 320px a lane
+          // is ~80px, and "Jóga s Jankou" clipped to "Jóga s" names nothing.
+          // Breaking inside words is worse than clipping ("Surfska te…"), so
+          // long words are left to overflow into the hidden area instead.
+          display: "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: titleLines,
+          overflow: "hidden",
+        }}
       >
         {tr(p.title)}
       </p>
-      <p
-        className="truncate text-[10px] opacity-75"
-        style={{ fontFamily: "var(--font-barlow-condensed)" }}
-      >
-        {subtitle}
-      </p>
+      {showSubtitle && (
+        <p
+          className="truncate text-[10px] opacity-75"
+          style={{ fontFamily: "var(--font-barlow-condensed)" }}
+        >
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 }
@@ -141,7 +169,7 @@ function DayTimetable({
             className="absolute right-0 -translate-y-2 text-right tabular-nums text-foreground/60"
             style={{
               top: i * SLOT_HEIGHT,
-              fontSize: 10,
+              fontSize: 12,
               fontFamily: "var(--font-barlow-condensed)",
             }}
           >
