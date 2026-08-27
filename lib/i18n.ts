@@ -21,6 +21,7 @@ export const translations = {
       campfire: "Ohnisko",
       meadow: "Festivalová Lúka",
       skateWave: "Skate vlna",
+      volleyball: "Volejbalové ihrisko",
     } satisfies Record<LocationKey, string>,
     install: {
       title: "Pridaj na plochu",
@@ -60,6 +61,7 @@ export const translations = {
       campfire: "Campfire",
       meadow: "Festival Meadow",
       skateWave: "Skate Wave",
+      volleyball: "Volleyball",
     } satisfies Record<LocationKey, string>,
     install: {
       title: "Add to Home Screen",

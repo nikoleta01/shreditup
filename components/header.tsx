@@ -16,8 +16,11 @@ export function Header() {
         <div className="flex items-center justify-between">
           <Link
             href="/program"
-            className="rounded text-xl leading-none text-card-foreground transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-            style={{ fontFamily: "var(--font-alfa)" }}
+            className="rounded text-xl leading-none transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+            style={{
+              fontFamily: "var(--font-geoparody)",
+              color: "#000000",
+            }}
           >
             {FESTIVAL_NAME}
           </Link>

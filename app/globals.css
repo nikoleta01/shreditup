@@ -100,6 +100,8 @@
   --chip-skatewave-foreground: #000000;
   --chip-skatepark:            #7c3aed;
   --chip-skatepark-foreground: #ffffff;
+  --chip-volleyball:            #ca8a04;
+  --chip-volleyball-foreground: #ffffff;
   --muted:              var(--surface-tint);
   --muted-foreground:    oklch(0.40 0.045 42);
   --accent:              var(--pink);

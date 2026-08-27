@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
+  formatTime,
   getProgramEntriesByDay,
   type ProgramEntry,
   type ProgramItem,
@@ -48,24 +49,27 @@ function TimeColumn({
   endTime: string;
 }) {
   return (
-    <div className="flex w-14 shrink-0 flex-col items-end pt-0.5">
+    // items-start, not items-end: right-aligning inside this 56px box left a
+    // ragged ~18px gap before the time, so the page looked inset further on the
+    // left than the 16px it has on the right.
+    <div className="flex w-14 shrink-0 flex-col items-start">
       <span
-        className="text-sm font-bold tabular-nums text-black"
+        className="text-lg font-bold leading-tight tabular-nums text-black"
         style={{
           fontFamily: "var(--font-barlow-condensed)",
           textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
         }}
       >
-        {startTime}
+        {formatTime(startTime)}
       </span>
       <span
-        className="text-xs tabular-nums text-black"
+        className="text-base tabular-nums text-black"
         style={{
           fontFamily: "var(--font-barlow-condensed)",
           textShadow: "0 1px 3px rgba(255, 255, 255, 0.8)",
         }}
       >
-        {endTime}
+        {formatTime(endTime)}
       </span>
     </div>
   );
@@ -93,7 +97,7 @@ function ProgramCard({
       <div className="flex-1 space-y-1 pb-1">
         <div>
           <h3
-            className="text-base font-bold leading-tight text-foreground"
+            className="text-lg font-bold leading-tight text-foreground"
             style={{ fontFamily: "var(--font-barlow-condensed)" }}
           >
             <ProgramTitle p={p} />
@@ -185,7 +189,7 @@ function LessonGroupCard({
       <TimeColumn startTime={startTime} endTime={endTime} />
       <div className="flex-1 space-y-1 pb-1">
         <h3
-          className="text-base font-bold leading-tight text-foreground"
+          className="text-lg font-bold leading-tight text-foreground"
           style={{ fontFamily: "var(--font-barlow-condensed)" }}
         >
           {tr(group.title)}
@@ -223,7 +227,7 @@ function LessonGroupCard({
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
                 <span className="text-xs font-bold tabular-nums">
-                  {slot.startTime}–{slot.endTime}
+                  {formatTime(slot.startTime)}–{formatTime(slot.endTime)}
                   {isBooked && " ✓"}
                 </span>
                 {left !== null && !isBooked && (
@@ -409,8 +413,13 @@ export default function ProgramPage() {
         {/* Brand band */}
         <div className="mb-6 text-center">
           <h1
-            className="mb-3 text-4xl leading-tight text-foreground"
-            style={{ fontFamily: "var(--font-alfa)", textWrap: "balance" }}
+            className="mb-3 text-4xl leading-tight"
+            style={{
+              fontFamily: "var(--font-geoparody)",
+              color: "#452113",
+              WebkitTextStroke: "1px var(--orange)",
+              textWrap: "balance",
+            }}
           >
             Meet your people
           </h1>

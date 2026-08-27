@@ -1,9 +1,10 @@
 // Semantic event type — drives color coding in the timetable. Keep this
-export type Category = "music" | "workshop" | "registration" | "info";
+export type Category = "workshop" | "registration" | "info";
 
 // Where an item happens. Stored as a key, not a label — the display string is
 // resolved per language via `t.locations[key]` in i18n.ts.
 export type LocationKey =
+  | "volleyball"
   | "mainStage"
   | "skatepark"
   | "campfire"
@@ -29,7 +30,7 @@ export const SLOT_GROUPS: Record<SlotGroupKey, SlotGroup> = {
     key: "wave",
     title: { sk: "Lekcie na vlne", en: "Skate Wave Lessons" },
     description: {
-      sk: "Kapacita lekcie je 5 ľudí. Vyber si jeden čas - aby sa ušlo každému, môžeš mať iba jednu lekciu na vlne a jednu v skateparku.",
+      sk: "Kapacita lekcie je 5 ľudí. Aby sa ušlo každému, vyber si iba jeden čas. Môžeš absolvovať jednu lekciu na vlne a jednu v skateparku.",
       en: "Each lesson fits 5 people. Pick one time — so that everyone gets a turn, you can book only one wave lesson and one skatepark lesson.",
     },
     location: "skateWave",
@@ -90,7 +91,7 @@ export const STAGE_NAME = "Main Stage";
 export const program: ProgramItem[] = [
   // Day 1 — Friday
   {
-    id: "d1-0",
+    id: "registration",
     title: {
       sk: "Registrácia a stavanie stanov",
       en: "Registration & tent setup",
@@ -104,7 +105,7 @@ export const program: ProgramItem[] = [
     },
   },
   {
-    id: "d1-1",
+    id: "rytmika",
     title: {
       sk: "Otvorenie festivalu a bubnovačka s Rytmikou",
       en: "Festival opening & drumming with Rytmika",
@@ -112,16 +113,15 @@ export const program: ProgramItem[] = [
     day: 1,
     startTime: "19:30",
     endTime: "20:30",
-    category: "music",
     location: "mainStage",
     description: {
-      sk: "Festival otvoríme spolu s Rytmikou, na konci môžete bubnovať spolu s nami.",
+      sk: "Festival odštartujeme spolu s Rytmikou, na konci môžete bubnovať spolu s nami.",
       en: "We'll open the festival together with Rytmika — at the end you can drum along with us.",
     },
     link: "https://rytmika.sk/",
   },
   {
-    id: "d1-2",
+    id: "open-mic",
     title: { sk: "Open Mic a Karaoke", en: "Open Mic & Karaoke" },
     day: 1,
     startTime: "21:00",
@@ -129,52 +129,80 @@ export const program: ProgramItem[] = [
     location: "mainStage",
   },
   {
-    id: "d1-3",
+    id: "campfire",
     title: { sk: "Vatra", en: "Bonfire" },
     day: 1,
     startTime: "21:00",
     endTime: "22:30",
-    category: "music",
     location: "campfire",
   },
   {
-    id: "d1-4",
+    id: "robson",
     title: { sk: "DJ Robson", en: "DJ Robson" },
     day: 1,
     startTime: "23:30",
     endTime: "03:00",
-    category: "music",
     location: "mainStage",
+    link: "https://www.instagram.com/robson.pov/",
   },
 
   // Day 2 — Saturday
   {
-    id: "d2-1",
+    id: "yoga-beginners",
     title: {
       sk: "Jóga s Jankou - začiatočníci",
       en: "Yoga with Janka - Beginners",
     },
     day: 2,
     startTime: "09:00",
-    endTime: "9:45",
+    endTime: "10:00",
     category: "workshop",
     location: "meadow",
+    link: "https://www.instagram.com/jana_siskova/",
     description: {
-      sk: "Janku už môžete poznať z našich Level Trevel hodín jógy v Sade Janka Kráľa. Tentokrát máme pre Vás pripravené 2 verzie, pre začiatočníkov aj mierne pokročilých.",
-      en: "Preparing translation.",
+      sk: "Janku už môžete poznať z našich Level Trevel hodín jógy v Sade Janka Kráľa. Pripravili sme pre Vás 2 varianty, pre začiatočníkov, neskôr pre mierne pokročilých. Kapacita neobmedzená, dones si len podložku.",
+      en: "Maybe Janka is already familiar to you from our Bratislava summer yoga sessions. This time, we prepared 2 version - for beginners and intermediates. Capacity is unlimited, just bring your mat.",
     },
+  },
+  {
+    id: "kamposvk",
+    title: {
+      sk: "Diskusia s Maťom (Kamposlovensku)",
+      en: "Discussion with Maťo (Kamposlovensku)",
+    },
+    description: {
+      sk: "Diskusia k rannej výberovej kávičke so zakladateľom komunity kamposlovensku Maťom Železníkom.",
+      en: "Discussion with the founder of kamposlovenku community.",
+    },
+    day: 2,
+    startTime: "09:30",
+    endTime: "10:30",
+    location: "mainStage",
+    link: "https://www.instagram.com/kamposlovensku/",
   },
   {
     id: "d2-2",
     title: {
       sk: "Jóga s Jankou - mierne pokročilí",
-      en: "Yoga with Janka - Intermediate",
+      en: "Yoga with Janka - Intermediates",
     },
     day: 2,
     startTime: "10:00",
-    endTime: "10:45",
+    endTime: "11:00",
     category: "workshop",
     location: "meadow",
+  },
+  {
+    id: "south-korea",
+    title: {
+      sk: "Prednáška Južná Kórea",
+      en: "South Korea",
+    },
+    day: 2,
+    startTime: "15:30",
+    endTime: "16:30",
+    location: "mainStage",
+    link: "https://www.instagram.com/ervinthestagram",
   },
   {
     id: "d2-37",
@@ -288,6 +316,61 @@ export const program: ProgramItem[] = [
     slotGroup: "skatepark",
   },
   {
+    id: "headstands",
+    title: {
+      sk: "Headstand workshop s Dominikom",
+      en: "Headstand Workshop with Dominik",
+    },
+    day: 2,
+    startTime: "10:00",
+    endTime: "12:00",
+    location: "meadow",
+    link: "https://www.instagram.com/dominik_raa/",
+    description: {
+      sk: "Dominik žije parkourom, lezením a pohybom. Prejdeš si vranu, stojku na hlave aj stojku na vystretých rukách s variáciami. Ešte si to neskúšal? Si na správnom mieste. Kapacita je 20 ľudí.",
+      en: "",
+    },
+  },
+  {
+    id: "frisbee-1",
+    title: {
+      sk: "Frisbee workshop Sky Up 1",
+      en: "Frisbee Workshop Sky Up 1",
+    },
+    day: 2,
+    startTime: "11:00",
+    endTime: "12:00",
+    location: "meadow",
+    link: "https://www.instagram.com/skyup.kosice/",
+    description: {
+      sk: "Chalani z košického klubu Sky Up ti ukážu základy frisbee hodov aj pár kúskov, ktoré vyzerajú nemožne.",
+      en: "",
+    },
+  },
+  {
+    id: "frisbee-2",
+    title: {
+      sk: "Frisbee workshop od Sky Up 2",
+      en: "Frisbee Workshop Sky Up 2",
+    },
+    day: 2,
+    startTime: "14:00",
+    endTime: "15:00",
+    location: "meadow",
+    link: "https://www.instagram.com/skyup.kosice/",
+  },
+  {
+    id: "volleyball",
+    title: {
+      sk: "Volejbalový turnaj",
+      en: "Volleyball tournament",
+    },
+    day: 2,
+    startTime: "14:00",
+    endTime: "17:00",
+    location: "volleyball",
+  },
+  {
     id: "d2-4",
     title: { sk: "Animal Flow", en: "Animal Flow" },
     day: 2,
@@ -297,11 +380,11 @@ export const program: ProgramItem[] = [
     location: "meadow",
   },
   {
-    id: "kviz",
+    id: "quiz",
     title: { sk: "Level Trevel Kvíz", en: "Level Trevel Quiz" },
     day: 2,
-    startTime: "11:30",
-    endTime: "13:00",
+    startTime: "11:00",
+    endTime: "12:00",
     location: "mainStage",
   },
   {
@@ -311,30 +394,64 @@ export const program: ProgramItem[] = [
     startTime: "13:00",
     endTime: "15:30",
     location: "mainStage",
+    description: {
+      sk: "Štyri stanovištia: linotlač od @zuzajda_liska (dones si tričko alebo čokoľvek, čo chceš upgradnúť, zvyšok máme), upcyklácia oblečenia od @dorota.cicatko, korálkovanie od @zuz_anna.k náramky od @agallovaa a výroba náramkov háčikovaním pod vedením @martin_zbojan z @recykloo a výroba keramiky z rýchlotvrdnúcej hliny.",
+      en: "",
+    },
   },
   {
-    id: "south-korea",
-    title: { sk: "Prednáška Južná Kórea", en: "South Korea Talk" },
+    id: "wrablova",
+    title: {
+      sk: "Diskusia Zuzana Vráblová",
+      en: "Discussion with Zuzana Vrablova",
+    },
     day: 2,
-    startTime: "15:30",
-    endTime: "16:30",
+    startTime: "18:30",
+    endTime: "19:30",
+    location: "mainStage",
+    link: "https://www.instagram.com/zuzanavrablova/",
+  },
+  {
+    id: "baca",
+    title: {
+      sk: "Diskusia Miroslav Bača",
+      en: "Discussion with Miroslav Bača",
+    },
+    day: 2,
+    startTime: "20:00",
+    endTime: "21:00",
+    location: "mainStage",
+    link: "https://www.instagram.com/thebacis/",
+  },
+  {
+    id: "alergy",
+    title: { sk: "DJ Alergy", en: "DJ Alergy" },
+    day: 2,
+    startTime: "21:00",
+    endTime: "22:30",
     location: "mainStage",
   },
-
-  // Day 3 — Sunday
   {
-    id: "d3-1",
-    title: { sk: "Vítanie Slnka", en: "Sun Salutation" },
-    day: 3,
-    startTime: "5:00",
-    endTime: "6:00",
-    location: "meadow",
+    id: "kazy",
+    title: { sk: "DJ Kazy", en: "DJ Kazy" },
+    day: 2,
+    startTime: "22:30",
+    endTime: "00:00",
+    location: "mainStage",
   },
 ];
 
 function toMinutes(time: string) {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
+}
+
+// Times are hand-typed, so "9:45" and "09:45" both occur. The program's time
+// column is left-aligned against the page padding, where an unpadded hour would
+// leave a ragged edge — so pad at render instead of trusting every entry.
+export function formatTime(time: string) {
+  const [h, m] = time.split(":");
+  return `${h.padStart(2, "0")}:${m}`;
 }
 
 export function getProgramByDay(day: 1 | 2 | 3) {

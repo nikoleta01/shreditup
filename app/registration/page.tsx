@@ -85,13 +85,13 @@ export default function RegistrationPage() {
   return (
     <div className="mx-auto max-w-md px-4 pt-8">
       <h1
-        className="mb-1 text-4xl leading-tight text-foreground"
-        style={{ fontFamily: "var(--font-alfa)" }}
+        className="mb-1 text-center text-4xl leading-tight text-foreground"
+        style={{ fontFamily: "var(--font-geoparody)" }}
       >
         Moje aktivity
       </h1>
       <p
-        className="mb-6 text-sm text-foreground/60"
+        className="mb-6 text-center text-sm text-foreground/60"
         style={{ fontFamily: "var(--font-barlow-condensed)" }}
       >
         {profile ? `${profile.first_name} ${profile.last_name}` : "Tvoje registrácie na festivale"}
