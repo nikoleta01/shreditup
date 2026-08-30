@@ -102,24 +102,11 @@ function ProgramCard({
           >
             <ProgramTitle p={p} />
           </h3>
-          {(p.location || (!p.activityId && p.category === "workshop")) && (
+          {p.location && (
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              {p.location && (
-                <WaveChip
-                  className="text-xs"
-                  tone={toneForLocation(p.location)}
-                >
-                  {t.locations[p.location]}
-                </WaveChip>
-              )}
-              {!p.activityId && p.category === "workshop" && (
-                <span
-                  className="text-xs font-bold text-foreground/60"
-                  style={{ fontFamily: "var(--font-barlow-condensed)" }}
-                >
-                  {t.noRegistration}
-                </span>
-              )}
+              <WaveChip className="text-xs" tone={toneForLocation(p.location)}>
+                {t.locations[p.location]}
+              </WaveChip>
             </div>
           )}
         </div>

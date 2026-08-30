@@ -132,6 +132,12 @@
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
   html {
+    /* Standalone PWAs have no browser chrome to hide rubber-band overscroll,
+       and Safari paints that area from html's background, not body's — so
+       without this, bouncing at the top/bottom flashes white instead of the
+       cream background, showing up as a "gap" once added to the home screen. */
+    @apply bg-background;
+    overscroll-behavior-y: none;
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
 }

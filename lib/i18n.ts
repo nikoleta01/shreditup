@@ -40,7 +40,6 @@ export const translations = {
       notSupported: "Notifikácie nie sú podporované.",
     },
     notifyBefore: "O 30 minút začína",
-    noRegistration: "Bez registrácie",
     full: "PLNÉ",
   },
   en: {
@@ -80,7 +79,6 @@ export const translations = {
       notSupported: "Notifications not supported.",
     },
     notifyBefore: "Starting in 30 minutes",
-    noRegistration: "No registration",
     full: "FULL",
   },
 } satisfies Record<Lang, unknown>;

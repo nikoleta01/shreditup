@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { getAdminSupabase } from '@/lib/supabase-admin'
-import { program, FESTIVAL_DAYS } from '@/lib/data'
+import { program, FESTIVAL_DAYS, formatTime } from '@/lib/data'
 
 export async function GET(req: Request) {
   if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -11,10 +11,11 @@ export async function GET(req: Request) {
   const now = new Date()
 
   const upcoming = program.filter((p) => {
-    const festDay = FESTIVAL_DAYS[p.day].date
-    const [h, m] = p.startTime.split(':').map(Number)
-    const perfDate = new Date(festDay)
-    perfDate.setHours(h, m, 0, 0)
+    const dateStr = FESTIVAL_DAYS[p.day].date.toISOString().slice(0, 10)
+    // Festival runs in Bratislava (CEST, UTC+2 in September). Built with an
+    // explicit offset rather than setHours(), which sets the hour in the
+    // server's own timezone (UTC on Vercel) and was firing pushes ~2h late.
+    const perfDate = new Date(`${dateStr}T${formatTime(p.startTime)}:00+02:00`)
 
     const diffMs = perfDate.getTime() - now.getTime()
     // 28–33 min window — sized for a 5-min cron, centered on 30 min before start
