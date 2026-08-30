@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Shreditup — apply pending schema to PRODUCTION
 -- =====================================================================
--- Covers migrations 20260714010000 .. 20260730150000.
+-- Covers migrations 20260714010000 .. 20260830224500.
 --
 -- Preferred route is `supabase login && supabase db push`, which applies these
 -- files and records them itself. This script exists for the Supabase SQL editor
@@ -230,6 +230,64 @@ on conflict ("id") do update
       "group_key" = excluded."group_key";
 
 -- ---------------------------------------------------------------------
+-- 20260830220000_seed_surfskate_competition
+-- One-off event, not part of a lesson group — group_key null.
+-- ---------------------------------------------------------------------
+insert into "public"."activities" ("id", "capacity", "group_key")
+values
+  ('88d4ad43-38b2-4127-88e1-2cb585ad511b', 40, null)
+on conflict ("id") do update
+  set "capacity" = excluded."capacity",
+      "group_key" = excluded."group_key";
+
+-- ---------------------------------------------------------------------
+-- 20260830223000_seed_skatepark_lessons
+-- Four more skatepark lessons: 11:00, 13:00 (cap 24 each), 14:00, 15:30
+-- (cap 20 each). Same `skatepark` group as the 9:30 one.
+-- ---------------------------------------------------------------------
+insert into "public"."activities" ("id", "capacity", "group_key")
+values
+  ('25e1b01b-0c86-4e18-9d45-f91fa0652a48', 24, 'skatepark'),
+  ('cc9b221f-7ce0-4f55-9d27-ad68f9aa6019', 24, 'skatepark'),
+  ('62468aa3-4e91-4da2-9d6f-bcd844d19f51', 20, 'skatepark'),
+  ('da37bdc5-b9ee-472f-9007-76052c28299e', 20, 'skatepark')
+on conflict ("id") do update
+  set "capacity" = excluded."capacity",
+      "group_key" = excluded."group_key";
+
+-- ---------------------------------------------------------------------
+-- 20260830224500_wave_lessons_restructure
+-- The 11:00–15:30 wave lessons changed shape: 2x30min per block becomes
+-- 3x20min per block. Six old 30-min slots replaced by nine new 20-min ones.
+-- Confirmed no real registrations exist yet against the old ids — the
+-- delete cascades any that do.
+-- ---------------------------------------------------------------------
+delete from "public"."activities"
+  where "id" in (
+    'b40a824c-bd43-4750-b3d7-287f7664bfbd',
+    '12cf30f1-1012-462f-89d9-19b165586a08',
+    '39ae68b5-a728-456c-8a48-acfe61e9548e',
+    '3a66cc94-09a1-48a0-acf2-1e91dd02f41e',
+    '214ec3ec-8a3f-4da0-baef-dc8844f69724',
+    '9979a19b-92b9-4d00-aa73-1206a54876fd'
+  );
+
+insert into "public"."activities" ("id", "capacity", "group_key")
+values
+  ('0f01ac1d-4cf5-495c-8f80-941913f0d352', 5, 'wave'),
+  ('7e537640-87fc-454a-8d08-5126a15cc73b', 5, 'wave'),
+  ('3324ce02-efa8-4a79-aaeb-96789dc6b6d0', 5, 'wave'),
+  ('6ca2e5bc-6dd3-4d1f-9b43-fd3be086379a', 5, 'wave'),
+  ('8f902c2b-3eb0-4028-9c73-7d8ab03b3677', 5, 'wave'),
+  ('05b2ab02-0675-452b-bd4a-b8a554b0e7e0', 5, 'wave'),
+  ('e3cc3a44-8aae-4719-b09c-6c4c8114c21f', 5, 'wave'),
+  ('75b56813-8a8b-473b-af83-b3236f76456e', 5, 'wave'),
+  ('1723b5ed-4757-4425-94d7-d629791b4eea', 5, 'wave')
+on conflict ("id") do update
+  set "capacity" = excluded."capacity",
+      "group_key" = excluded."group_key";
+
+-- ---------------------------------------------------------------------
 -- Record these versions so a later `supabase db push` skips them.
 -- ---------------------------------------------------------------------
 insert into "supabase_migrations"."schema_migrations" ("version", "name")
@@ -238,10 +296,23 @@ values
   ('20260730120000', 'activity_groups'),
   ('20260730120100', 'seed_lesson_activities'),
   ('20260730140000', 'activity_capacity_display'),
-  ('20260730150000', 'wave_lessons_round_two')
+  ('20260730150000', 'wave_lessons_round_two'),
+  ('20260830220000', 'seed_surfskate_competition'),
+  ('20260830223000', 'seed_skatepark_lessons'),
+  ('20260830224500', 'wave_lessons_restructure')
 on conflict ("version") do nothing;
 
 commit;
 
--- Sanity check after running — expect 10 rows, wave x9 cap 5, skatepark x1 cap 24:
+-- Sanity check after running — expect 19 rows, wave x12 cap 5, skatepark x5
+-- (cap 24,24,24,20,20), surfskate competition x1 cap 40:
 --   select group_key, count(*), sum(capacity) from public.activities group by group_key;
+
+-- IMPORTANT: production may already have real registrations against the old
+-- wave activity ids (b40a824c…, 12cf30f1…, 39ae68b5…, 3a66cc94…, 214ec3ec…,
+-- 9979a19b…) if anyone registered before this schedule change. The delete
+-- above cascades and silently drops those registrations. Check first:
+--   select count(*) from activity_registrations where activity_id in (
+--     'b40a824c-bd43-4750-b3d7-287f7664bfbd', '12cf30f1-1012-462f-89d9-19b165586a08',
+--     '39ae68b5-a728-456c-8a48-acfe61e9548e', '3a66cc94-09a1-48a0-acf2-1e91dd02f41e',
+--     '214ec3ec-8a3f-4da0-baef-dc8844f69724', '9979a19b-92b9-4d00-aa73-1206a54876fd');
