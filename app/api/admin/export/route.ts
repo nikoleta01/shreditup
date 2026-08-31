@@ -19,20 +19,29 @@ export async function GET(req: Request) {
 
   const { data: regs, error } = await supabase
     .from('activity_registrations')
-    .select('user_id')
+    .select('user_id, created_at')
     .eq('activity_id', activityId)
+    .order('created_at', { ascending: true })
 
   if (error) return new Response(error.message, { status: 500 })
 
   const userIds = (regs ?? []).map((r: { user_id: string }) => r.user_id)
   const { data: profiles } = userIds.length > 0
-    ? await supabase.from('profiles').select('first_name, last_name').in('id', userIds)
+    ? await supabase.from('profiles').select('id, first_name, last_name').in('id', userIds)
     : { data: [] }
 
-  const rows = (profiles ?? []).map((p: { first_name: string; last_name: string }) =>
-    `"${p.first_name}","${p.last_name}"`
+  // .in() doesn't preserve input order, so look profiles up by id instead of
+  // zipping by index — numbering has to follow registration order, not
+  // whatever order Postgres happens to return profiles in.
+  const profileById = new Map(
+    (profiles ?? []).map((p: { id: string; first_name: string; last_name: string }) => [p.id, p]),
   )
-  const csv = ['Meno,Priezvisko', ...rows].join('\n')
+  const rows = (regs ?? []).flatMap((r: { user_id: string }, i: number) => {
+    const p = profileById.get(r.user_id)
+    if (!p) return []
+    return [`${i + 1},"${p.first_name}","${p.last_name}"`]
+  })
+  const csv = ['Číslo,Meno,Priezvisko', ...rows].join('\n')
 
   // Activity name for the filename comes from lib/data.ts, not the DB.
   const name = getRegisterableActivity(activityId)?.title.sk ?? activityId
