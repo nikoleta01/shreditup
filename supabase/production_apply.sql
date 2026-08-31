@@ -1,7 +1,7 @@
 -- =====================================================================
 -- Shreditup — apply pending schema to PRODUCTION
 -- =====================================================================
--- Covers migrations 20260714010000 .. 20260830224500.
+-- Covers migrations 20260714010000 .. 20260831123000.
 --
 -- Preferred route is `supabase login && supabase db push`, which applies these
 -- files and records them itself. This script exists for the Supabase SQL editor
@@ -288,6 +288,120 @@ on conflict ("id") do update
       "group_key" = excluded."group_key";
 
 -- ---------------------------------------------------------------------
+-- 20260831120000_wave_lessons_max_two
+-- Wave now allows 2 lessons per person instead of 1 (skatepark stays at 1).
+-- A plain unique index can only express "at most one", so the group cap
+-- moves inside the function, guarded by an advisory lock on
+-- (user_id, group_key) — without it, two concurrent taps on two different
+-- wave lessons could both pass a stale count check and let a third slip through.
+-- ---------------------------------------------------------------------
+drop index if exists "public"."one_activity_per_group_per_user";
+
+create or replace function "public"."register_for_activity"("p_activity_id" "uuid")
+returns json
+language "plpgsql" security definer
+as $$
+declare
+  v_capacity int;
+  v_group_key text;
+  v_count int;
+  v_group_count int;
+  v_max_per_user int;
+begin
+  if auth.uid() is null then
+    return json_build_object('error', 'not_authenticated');
+  end if;
+
+  select capacity, group_key into v_capacity, v_group_key
+  from activities
+  where id = p_activity_id
+  for update;
+
+  if not found then
+    return json_build_object('error', 'not_found');
+  end if;
+
+  if v_group_key is not null then
+    perform pg_advisory_xact_lock(
+      hashtextextended(auth.uid()::text || ':' || v_group_key, 0)
+    );
+
+    v_max_per_user := case v_group_key when 'wave' then 2 else 1 end;
+
+    select count(*) into v_group_count
+    from activity_registrations
+    where user_id = auth.uid() and group_key = v_group_key;
+
+    if v_group_count >= v_max_per_user then
+      return json_build_object('error', 'group_taken', 'group', v_group_key);
+    end if;
+  end if;
+
+  select count(*) into v_count
+  from activity_registrations
+  where activity_id = p_activity_id;
+
+  if v_count >= v_capacity then
+    return json_build_object('error', 'full');
+  end if;
+
+  insert into activity_registrations (user_id, activity_id, group_key)
+  values (auth.uid(), p_activity_id, v_group_key);
+
+  return json_build_object('success', true);
+
+exception
+  when unique_violation then
+    return json_build_object('error', 'already_registered');
+end;
+$$;
+
+-- ---------------------------------------------------------------------
+-- 20260831123000_wave_lessons_15min
+-- Wave lessons change shape again: 3x20min per hour-block becomes 4x15min
+-- per block (4 lessons/hour instead of 3), capacity drops 5 -> 4. Confirmed
+-- no real registrations exist yet against the old ids — the delete cascades
+-- any that do.
+-- ---------------------------------------------------------------------
+delete from "public"."activities"
+  where "id" in (
+    'a5dfa5dd-5ed8-4ad7-afff-a64ffbaf190d',
+    'd1665533-4ca4-4b06-b85b-be64145ee966',
+    '9bc73fdf-a9cb-48b0-8b0e-dfbda73b07d0',
+    '0f01ac1d-4cf5-495c-8f80-941913f0d352',
+    '7e537640-87fc-454a-8d08-5126a15cc73b',
+    '3324ce02-efa8-4a79-aaeb-96789dc6b6d0',
+    '6ca2e5bc-6dd3-4d1f-9b43-fd3be086379a',
+    '8f902c2b-3eb0-4028-9c73-7d8ab03b3677',
+    '05b2ab02-0675-452b-bd4a-b8a554b0e7e0',
+    'e3cc3a44-8aae-4719-b09c-6c4c8114c21f',
+    '75b56813-8a8b-473b-af83-b3236f76456e',
+    '1723b5ed-4757-4425-94d7-d629791b4eea'
+  );
+
+insert into "public"."activities" ("id", "capacity", "group_key")
+values
+  ('1b9fd50d-3c66-49e8-a3a8-5c6604dcaecb', 4, 'wave'),
+  ('533fe899-35e6-4c10-9073-61b2447413ef', 4, 'wave'),
+  ('daa1a327-8109-49a9-99f1-3c54fd14a02f', 4, 'wave'),
+  ('8dc9d003-27c0-47cf-ae1e-5f2ad2d8faa9', 4, 'wave'),
+  ('0bc795ad-b297-4d41-b605-90403879fcf8', 4, 'wave'),
+  ('5d15301e-2d7d-44cc-9a9e-71e597414e71', 4, 'wave'),
+  ('eaad49e2-b44f-4b8e-8b87-65cb932a976f', 4, 'wave'),
+  ('59339517-4468-47ad-bd98-9431d379c867', 4, 'wave'),
+  ('261c754a-e546-4e94-bdc8-f6f9c4423dad', 4, 'wave'),
+  ('da8d889b-d5c3-43fc-8c88-83b09dd3f6e7', 4, 'wave'),
+  ('bbca85dd-0130-4149-bed8-a54d73e30c39', 4, 'wave'),
+  ('11f7f3f5-b07a-433a-b565-b3a2e9672688', 4, 'wave'),
+  ('d1693fb1-93ea-42fa-a17f-6cd6970120b7', 4, 'wave'),
+  ('177ea05d-55ef-4a82-9fac-526c40d4e0e5', 4, 'wave'),
+  ('693c683a-e2b7-40e9-b520-fa144c8fb3d0', 4, 'wave'),
+  ('90e540b2-da23-4240-b6d5-1e5840f32710', 4, 'wave')
+on conflict ("id") do update
+  set "capacity" = excluded."capacity",
+      "group_key" = excluded."group_key";
+
+-- ---------------------------------------------------------------------
 -- Record these versions so a later `supabase db push` skips them.
 -- ---------------------------------------------------------------------
 insert into "supabase_migrations"."schema_migrations" ("version", "name")
@@ -299,14 +413,32 @@ values
   ('20260730150000', 'wave_lessons_round_two'),
   ('20260830220000', 'seed_surfskate_competition'),
   ('20260830223000', 'seed_skatepark_lessons'),
-  ('20260830224500', 'wave_lessons_restructure')
+  ('20260830224500', 'wave_lessons_restructure'),
+  ('20260831120000', 'wave_lessons_max_two'),
+  ('20260831123000', 'wave_lessons_15min')
 on conflict ("version") do nothing;
 
 commit;
 
--- Sanity check after running — expect 19 rows, wave x12 cap 5, skatepark x5
--- (cap 24,24,24,20,20), surfskate competition x1 cap 40:
+-- Sanity check after running — expect 22 rows, wave x16 cap 4 (sum 64),
+-- skatepark x5 cap 24,24,24,20,20 (sum 112), surfskate competition x1 cap 40:
 --   select group_key, count(*), sum(capacity) from public.activities group by group_key;
+-- Overall total: 22 rows, capacity sums to 216.
+--
+-- Behavioral check: the same test user should be able to hold 2 wave
+-- registrations but only 1 skatepark registration — 3rd wave / 2nd skatepark
+-- attempt should return {"error":"group_taken"}.
+--
+-- IMPORTANT: as with the earlier wave restructure, check production doesn't
+-- already have real registrations against the old wave ids before running —
+-- the delete above cascades and silently drops them:
+--   select count(*) from activity_registrations where activity_id in (
+--     'a5dfa5dd-5ed8-4ad7-afff-a64ffbaf190d', 'd1665533-4ca4-4b06-b85b-be64145ee966',
+--     '9bc73fdf-a9cb-48b0-8b0e-dfbda73b07d0', '0f01ac1d-4cf5-495c-8f80-941913f0d352',
+--     '7e537640-87fc-454a-8d08-5126a15cc73b', '3324ce02-efa8-4a79-aaeb-96789dc6b6d0',
+--     '6ca2e5bc-6dd3-4d1f-9b43-fd3be086379a', '8f902c2b-3eb0-4028-9c73-7d8ab03b3677',
+--     '05b2ab02-0675-452b-bd4a-b8a554b0e7e0', 'e3cc3a44-8aae-4719-b09c-6c4c8114c21f',
+--     '75b56813-8a8b-473b-af83-b3236f76456e', '1723b5ed-4757-4425-94d7-d629791b4eea');
 
 -- IMPORTANT: production may already have real registrations against the old
 -- wave activity ids (b40a824c…, 12cf30f1…, 39ae68b5…, 3a66cc94…, 214ec3ec…,

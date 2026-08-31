@@ -167,9 +167,10 @@ function LessonGroupCard({
 }) {
   const { t, tr, lang } = useLang();
   const { group, slots, startTime, endTime } = entry;
-  const booked = slots.find(
+  const bookedSlots = slots.filter(
     (s) => s.activityId && registeredIds.has(s.activityId),
   );
+  const atMax = bookedSlots.length >= group.maxPerUser;
 
   return (
     <div className="flex gap-4 py-4">
@@ -191,13 +192,13 @@ function LessonGroupCard({
         <div className="flex flex-wrap gap-2 pt-2">
           {slots.map((slot) => {
             if (!slot.activityId) return null;
-            const isBooked = booked?.id === slot.id;
+            const isBooked = bookedSlots.some((b) => b.id === slot.id);
             const seat = availability.get(slot.activityId);
             const left = seat ? Math.max(seat.capacity - seat.count, 0) : null;
             const isFull = left === 0 && !isBooked;
-            // Already holding a slot in this group blocks the siblings — the
-            // DB rejects a second one, so don't offer the tap.
-            const blocked = (!!booked && !isBooked) || isFull;
+            // Hitting the group's max blocks the remaining siblings — the
+            // DB rejects going over it, so don't offer the tap.
+            const blocked = (atMax && !isBooked) || isFull;
             return (
               <button
                 key={slot.id}
@@ -227,12 +228,15 @@ function LessonGroupCard({
           })}
         </div>
 
-        {booked && (
+        {bookedSlots.length > 0 && (
           <p
             className="pt-1 text-xs font-bold text-foreground/85"
             style={{ fontFamily: "var(--font-barlow-condensed)" }}
           >
-            Prihlásený/á · {booked.startTime}–{booked.endTime}
+            Prihlásený/á ·{" "}
+            {bookedSlots
+              .map((s) => `${s.startTime}–${s.endTime}`)
+              .join(", ")}
           </p>
         )}
       </div>

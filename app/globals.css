@@ -135,9 +135,11 @@
     /* Standalone PWAs have no browser chrome to hide rubber-band overscroll,
        and Safari paints that area from html's background, not body's — so
        without this, bouncing at the top/bottom flashes white instead of the
-       cream background, showing up as a "gap" once added to the home screen. */
+       cream background, showing up as a "gap" once added to the home screen.
+       (overscroll-behavior-y: none was tried here too, but it silently broke
+       scrolling entirely on iOS standalone on most pages — known WebKit
+       landmine. Don't re-add it without testing on a real device first.) */
     @apply bg-background;
-    overscroll-behavior-y: none;
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
 }
