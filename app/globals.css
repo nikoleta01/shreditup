@@ -128,6 +128,14 @@
     @apply border-border outline-ring/50;
   }
   body {
+    /* min-h-svh (Tailwind, set inline on <body> in layout.tsx) alone isn't
+       enough in iOS standalone PWAs — svh has been observed under-reporting
+       the true visible height there by a variable amount, leaving html/body's
+       painted box short of the physical bottom edge (native black canvas
+       showing through underneath everything, including the fixed nav, in a
+       gap whose size drifts between reflows). Anchoring to height: 100% is
+       the more reliable floor for this specific case. */
+    height: 100%;
     @apply bg-background text-foreground;
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
@@ -139,6 +147,7 @@
        (overscroll-behavior-y: none was tried here too, but it silently broke
        scrolling entirely on iOS standalone on most pages — known WebKit
        landmine. Don't re-add it without testing on a real device first.) */
+    height: 100%;
     @apply bg-background;
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
