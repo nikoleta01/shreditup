@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { useLang } from "@/components/language-provider";
-import { WaveChip } from "@/components/wave-chip";
 import { getRegisterableActivity, type ProgramItem } from "@/lib/data";
 
 type Profile = {
@@ -116,15 +115,21 @@ export default function RegistrationPage() {
         <div className="space-y-3">
           {myActivities.map(({ id, item }) => (
             <div key={id} className="border-2 border-foreground bg-card p-4">
-              <div className="mb-2">
-                <WaveChip className="text-sm">{tr(item.title)}</WaveChip>
-              </div>
+              <h3
+                className="mb-2 text-xl leading-tight text-foreground"
+                style={{ fontFamily: "var(--font-geoparody)" }}
+              >
+                {tr(item.title)}
+              </h3>
               <div
                 className="mb-4 flex gap-3 text-xs text-foreground/60"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
                 <span>{dayLabel(item.day)}</span>
                 <span>{item.startTime}</span>
+                {item.location && (
+                  <span className="text-foreground">{t.locations[item.location]}</span>
+                )}
               </div>
               {item.description && (
                 <p className="mb-4 text-sm text-foreground/70" style={{ fontFamily: "var(--font-barlow-condensed)" }}>

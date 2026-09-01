@@ -11,7 +11,6 @@ export type PoiTypeId =
   | "showers"
   | "campfire"
   | "volleyball"
-  | "paddle"
   | "parkingP2"
   | "parkingLong";
 
@@ -38,7 +37,7 @@ export const POI_TYPES: PoiType[] = [
     emoji: "🎤",
     sk: "Hlavný stage",
     en: "Main stage",
-    color: "#7c3aed",
+    color: "#d77ea6",
     scale: 1.25,
   },
   {
@@ -100,13 +99,6 @@ export const POI_TYPES: PoiType[] = [
     color: "#ca8a04",
   },
   {
-    id: "paddle",
-    emoji: "🏄",
-    sk: "Súťaž v pádlovaní",
-    en: "Paddling",
-    color: "#2563eb",
-  },
-  {
     id: "parkingP2",
     emoji: "🅿️",
     sk: "Parkovisko P2",
@@ -147,7 +139,6 @@ export const MAP_POIS: MapPoi[] = [
   { type: "showers", x: 37.28, y: 14.5 },
   { type: "campfire", x: 18, y: 38.56 },
   { type: "volleyball", x: 53.57, y: 86.06 },
-  { type: "paddle", x: 95.54, y: 91 },
   { type: "parkingP2", x: 57.8, y: 4.2 },
   { type: "parkingLong", x: 70.98, y: 52.75 },
 ];

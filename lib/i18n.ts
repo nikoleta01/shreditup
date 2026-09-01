@@ -41,6 +41,13 @@ export const translations = {
     },
     notifyBefore: "O 30 minút začína",
     full: "PLNÉ",
+    info: "Info",
+    infoPage: {
+      emergency: "Núdzové kontakty",
+      registrationNote: "Pre registráciu po 19:00 volaj",
+      partners: "Partneri",
+      partnersSoon: "Čoskoro pridáme.",
+    },
   },
   en: {
     program: "Program",
@@ -80,6 +87,13 @@ export const translations = {
     },
     notifyBefore: "Starting in 30 minutes",
     full: "FULL",
+    info: "Info",
+    infoPage: {
+      emergency: "Emergency contacts",
+      registrationNote: "For registration after 19:00 call",
+      partners: "Partners",
+      partnersSoon: "Coming soon.",
+    },
   },
 } satisfies Record<Lang, unknown>;
 
