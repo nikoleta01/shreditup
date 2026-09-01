@@ -76,9 +76,22 @@ alter table "public"."activity_registrations"
 -- index, not a check inside register_for_activity(): that function locks only
 -- the activity row it was given, which does not stop the same user registering
 -- for a sibling slot concurrently.
-create unique index if not exists "one_activity_per_group_per_user"
-  on "public"."activity_registrations" ("user_id", "group_key")
-  where "group_key" is not null;
+--
+-- Superseded by wave_lessons_max_two below, which drops this same index to
+-- allow 2 wave registrations per person. Skipped here if that migration
+-- already landed — otherwise re-running this script against a production DB
+-- with real 2-per-group registrations fails the index creation outright.
+do $$
+begin
+  if not exists (
+    select 1 from "supabase_migrations"."schema_migrations"
+    where "version" = '20260831120000'
+  ) then
+    create unique index if not exists "one_activity_per_group_per_user"
+      on "public"."activity_registrations" ("user_id", "group_key")
+      where "group_key" is not null;
+  end if;
+end $$;
 
 -- The old "own registrations only" policy was FOR ALL, so any authenticated
 -- client could insert straight into activity_registrations and skip the

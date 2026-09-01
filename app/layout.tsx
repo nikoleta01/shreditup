@@ -76,7 +76,7 @@ export default function RootLayout({
         <LanguageProvider>
           <Header />
           <InstallPrompt />
-          <main className="flex-1 pb-20">{children}</main>
+          <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))]">{children}</main>
           <BottomNav />
         </LanguageProvider>
       </body>
