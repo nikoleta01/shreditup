@@ -128,6 +128,11 @@ export const program: ProgramItem[] = [
     startTime: "21:00",
     endTime: "23:00",
     location: "mainStage",
+    link: "https://www.youtube.com/watch?v=b7k0a5hYnSI&list=RDb7k0a5hYnSI&start_radio=1",
+    description: {
+      sk: "Radko s Peťom to naštartujú s gitarou a ďalej môže zahrať a zaspievať ktokoľvek. Ak na niečo hráš, prines si to. Vážne!",
+      en: "",
+    },
   },
   {
     id: "campfire",
@@ -190,6 +195,7 @@ export const program: ProgramItem[] = [
     startTime: "10:00",
     endTime: "11:00",
     location: "meadow",
+    link: "https://www.instagram.com/jana_siskova/",
   },
   {
     id: "south-korea",
@@ -202,6 +208,10 @@ export const program: ProgramItem[] = [
     endTime: "16:30",
     location: "mainStage",
     link: "https://www.instagram.com/ervinthestagram",
+    description: {
+      sk: "Kultúra, gastro a ochutnávka priamo na mieste.",
+      en: "",
+    },
   },
   {
     id: "wave-1",
@@ -467,14 +477,23 @@ export const program: ProgramItem[] = [
     startTime: "14:00",
     endTime: "17:00",
     location: "volleyball",
+    description: {
+      sk: "Tretí ročník. Máš tím? Super. Nemáš? Priradíme ťa.",
+      en: "Third year. Do you have a team? Great. You don't? We will put you into one.",
+    },
   },
   {
-    id: "d2-4",
-    title: { sk: "Animal Flow", en: "Animal Flow" },
+    id: "animal-flow",
+    title: { sk: "Animal Flow s Peťom", en: "Animal Flow with Peťo" },
     day: 2,
     startTime: "17:00",
     endTime: "19:30",
     location: "meadow",
+    description: {
+      sk: "Peťo priniesol animal flow na Slovensko medzi prvými. Je k tomu skvelý jogín a surfer. Ide o základný workshop, zapojíš sa bez akejkoľvek prípravy.",
+      en: "",
+    },
+    link: "https://www.instagram.com/peterjanosik/",
   },
   {
     id: "quiz",
@@ -504,9 +523,13 @@ export const program: ProgramItem[] = [
     endTime: "18:30",
     location: "skateWave",
     activityId: "88d4ad43-38b2-4127-88e1-2cb585ad511b",
+    description: {
+      en: "",
+      sk: "30 sekúnd na vlne, dva pokusy, ceny od partnerov festivalu. Pre začiatočníkov aj pokročilých!",
+    },
   },
   {
-    id: "wrablova",
+    id: "vrablova",
     title: {
       sk: "Diskusia Zuzana Vráblová",
       en: "Discussion with Zuzana Vrablova",
@@ -515,6 +538,10 @@ export const program: ProgramItem[] = [
     startTime: "18:30",
     endTime: "19:30",
     location: "mainStage",
+    description: {
+      sk: "Niekoľkonásobná majsterka sveta vo wakeskatingu. Ako sa k tomu športu dostala a čo obnáša byť profi športovkyňou na Slovensku.",
+      en: "",
+    },
     link: "https://www.instagram.com/zuzanavrablova/",
   },
   {
@@ -528,6 +555,10 @@ export const program: ProgramItem[] = [
     endTime: "21:00",
     location: "mainStage",
     link: "https://www.instagram.com/thebacis/",
+    description: {
+      sk: "Kto ešte Baču nepozná, spozná ho rýchlo. O cestovaní, surfovaní a o 'haraburdách'",
+      en: "",
+    },
   },
   {
     id: "alergy",
@@ -536,6 +567,7 @@ export const program: ProgramItem[] = [
     startTime: "21:00",
     endTime: "22:30",
     location: "mainStage",
+    link: "https://www.instagram.com/alergy_dnb/",
   },
   {
     id: "kazy",
@@ -544,6 +576,7 @@ export const program: ProgramItem[] = [
     startTime: "22:30",
     endTime: "00:00",
     location: "mainStage",
+    link: "https://www.instagram.com/richard_kazy/",
   },
 ];
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Info } from "lucide-react";
 
 import { FESTIVAL_NAME } from "@/lib/data";
 import { NotificationButton } from "@/components/notification-button";
@@ -41,6 +42,13 @@ export function Header() {
               {lang === "sk" ? "EN" : "SK"}
             </button>
             <NotificationButton />
+            <Link
+              href="/info"
+              className="inline-flex h-7 w-7 items-center justify-center rounded border-2 border-foreground bg-foreground text-background transition-colors hover:bg-transparent hover:text-foreground"
+              aria-label={t.info}
+            >
+              <Info className="h-4 w-4" aria-hidden />
+            </Link>
           </div>
         </div>
       </div>

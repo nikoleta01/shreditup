@@ -3,7 +3,7 @@ import { AdminLogin } from './_components/AdminLogin'
 import { BroadcastForm } from './_components/BroadcastForm'
 import { getAdminSupabase } from '@/lib/supabase-admin'
 import { FESTIVAL_DAYS, getRegisterableActivity } from '@/lib/data'
-import { WaveChip } from '@/components/wave-chip'
+import { translations } from '@/lib/i18n'
 
 type Activity = {
   id: string
@@ -57,6 +57,7 @@ export default async function AdminPage() {
         title: item?.title.sk ?? a.id,
         day: item?.day,
         startTime: item?.startTime,
+        location: item?.location ? translations.sk.locations[item.location] : undefined,
         participants: ((allRegs ?? []) as Registration[])
           .filter((r) => r.activity_id === a.id)
           .map((r) => profileMap.get(r.user_id))
@@ -71,13 +72,13 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto max-w-md px-4 pt-8 pb-8">
       <h1
-        className="mb-1 text-4xl leading-tight text-foreground"
-        style={{ fontFamily: 'var(--font-alfa)' }}
+        className="mb-1 text-center text-4xl leading-tight text-foreground"
+        style={{ fontFamily: 'var(--font-geoparody)' }}
       >
         Admin
       </h1>
       <p
-        className="mb-6 text-sm text-foreground/60"
+        className="mb-6 text-center text-sm text-foreground/60"
         style={{ fontFamily: 'var(--font-barlow-condensed)' }}
       >
         Účastníci aktivít
@@ -88,16 +89,20 @@ export default async function AdminPage() {
       <div className="space-y-4">
         {activitiesWithParticipants.map((activity) => (
           <div key={activity.id} className="border-2 border-foreground bg-card p-4">
-            <div className="mb-1">
-              <WaveChip className="text-sm">{activity.title}</WaveChip>
-            </div>
+            <h3
+              className="mb-1 text-xl leading-tight text-foreground"
+              style={{ fontFamily: 'var(--font-geoparody)' }}
+            >
+              {activity.title}
+            </h3>
             <div
-              className="mb-3 flex items-center gap-3 text-xs text-foreground/60"
+              className="mb-3 flex items-center gap-3 text-xs font-bold text-foreground"
               style={{ fontFamily: 'var(--font-barlow-condensed)' }}
             >
               <span>{dayLabel(activity.day)}</span>
               <span>{activity.startTime}</span>
-              <span className="ml-auto font-bold text-foreground">
+              {activity.location && <span>{activity.location}</span>}
+              <span className="ml-auto text-foreground">
                 {activity.participants.length} / {activity.capacity}
               </span>
             </div>

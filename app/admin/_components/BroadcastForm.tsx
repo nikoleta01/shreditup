@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-const FONT_HEAD = { fontFamily: 'var(--font-alfa)' }
+const FONT_HEAD = { fontFamily: 'var(--font-geoparody)' }
 const FONT_BODY = { fontFamily: 'var(--font-barlow-condensed)' }
 
 function recipientLabel(n: number) {

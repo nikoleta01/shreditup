@@ -17,6 +17,8 @@ import { ProgramTitle } from "@/components/program-title";
 import { ensureAnonymousSession, getSupabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
+const SKATE_WAVE_URL = "https://www.kokopeli.sk/";
+
 type Profile = { first_name: string; last_name: string };
 
 type ActivityRow = {
@@ -104,7 +106,11 @@ function ProgramCard({
           </h3>
           {p.location && (
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <WaveChip className="text-xs" tone={toneForLocation(p.location)}>
+              <WaveChip
+                className="text-xs"
+                tone={toneForLocation(p.location)}
+                href={p.location === "skateWave" ? SKATE_WAVE_URL : undefined}
+              >
                 {t.locations[p.location]}
               </WaveChip>
             </div>
@@ -183,7 +189,11 @@ function LessonGroupCard({
           {tr(group.title)}
         </h3>
         <div className="mt-1 flex flex-wrap items-center gap-2">
-          <WaveChip className="text-xs" tone={toneForLocation(group.location)}>
+          <WaveChip
+            className="text-xs"
+            tone={toneForLocation(group.location)}
+            href={group.location === "skateWave" ? SKATE_WAVE_URL : undefined}
+          >
             {t.locations[group.location]}
           </WaveChip>
         </div>
@@ -205,7 +215,7 @@ function LessonGroupCard({
                 disabled={blocked}
                 aria-pressed={isBooked}
                 onClick={() => onRegister(slot.activityId!, tr(slot.title))}
-                className={`flex flex-col items-center border-2 border-foreground px-2.5 py-1 transition-colors ${
+                className={`flex w-24 flex-col items-center whitespace-nowrap border-2 border-foreground px-2.5 py-1 transition-colors ${
                   isBooked
                     ? "bg-foreground text-background"
                     : blocked
