@@ -133,9 +133,17 @@
        the true visible height there by a variable amount, leaving html/body's
        painted box short of the physical bottom edge (native black canvas
        showing through underneath everything, including the fixed nav, in a
-       gap whose size drifts between reflows). Anchoring to height: 100% is
-       the more reliable floor for this specific case. */
-    height: 100%;
+       gap whose size drifts between reflows). height: 100% was tried next as
+       a more reliable floor, but the gap persists specifically on pages whose
+       content is shorter than one screen (Map, Aktivity) — those never scroll,
+       and scrolling is apparently what makes WebKit recompute the viewport
+       correctly on this device. 100dvh is the next trial: unlike a static
+       height/svh snapshot taken at load, dvh is meant to keep tracking the
+       actual visible viewport without needing a scroll to force a reflow.
+       Needs verifying on a real iOS standalone PWA — if the gap still drifts
+       after this, dvh isn't the fix either and the next step is measuring
+       visualViewport.height in JS instead of trusting any CSS viewport unit. */
+    height: 100dvh;
     @apply bg-background text-foreground;
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
@@ -147,7 +155,7 @@
        (overscroll-behavior-y: none was tried here too, but it silently broke
        scrolling entirely on iOS standalone on most pages — known WebKit
        landmine. Don't re-add it without testing on a real device first.) */
-    height: 100%;
+    height: 100dvh;
     @apply bg-background;
     font-family: var(--font-barlow), system-ui, sans-serif;
   }
