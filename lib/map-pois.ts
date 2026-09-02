@@ -19,6 +19,7 @@ export type PoiTypeId =
   | "mainStage"
   | "skateWave"
   | "tents"
+  | "vandrak"
   | "meadow"
   | "chillZone"
   | "restaurant"
@@ -57,6 +58,8 @@ export const POI_TYPES: PoiType[] = [
     en: "Tent area",
     color: "#0891b2",
   },
+  // Same emoji as "tents", so the colour has to carry the difference.
+  { id: "vandrak", emoji: "⛺", sk: "Vandrák", en: "Vandrák", color: "#b91c1c" },
   { id: "meadow", emoji: "🧘", ...fromProgram("meadow") },
   {
     id: "chillZone",
@@ -137,4 +140,5 @@ export const MAP_POIS: MapPoi[] = [
   { type: "parkingLong", x: 70.76, y: 40.41 },
   { type: "chillZone", x: 47.1, y: 39.79 },
   { type: "football", x: 20.98, y: 22.83 },
+  { type: "vandrak", x: 34.6, y: 33.31 },
 ];

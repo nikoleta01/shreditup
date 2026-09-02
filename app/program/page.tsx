@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import {
   formatTime,
@@ -18,6 +18,8 @@ import { ensureAnonymousSession, getSupabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
 const SKATE_WAVE_URL = "https://www.kokopeli.sk/";
+const LEVEL_TREVEL_URL = "https://www.leveltrevel.sk/";
+const KAMPOSLOVENSKU_URL = "https://www.instagram.com/kamposlovensku/";
 
 type Profile = { first_name: string; last_name: string };
 
@@ -38,10 +40,44 @@ type Modal =
 
 // Mirrors activities.group_key in the DB. One registration per group per person
 // for the whole festival, so the slots spread across as many people as possible.
-const GROUP_LABEL: Record<string, string> = {
-  wave: "lekciu na vlne",
-  skatepark: "lekciu v skateparku",
-};
+
+// Instagram allows letters, digits, underscores and inner dots. The tail is
+// deliberately not a dot, so a handle ending a sentence doesn't swallow the
+// full stop.
+const IG_HANDLE = /@([A-Za-z0-9_](?:[A-Za-z0-9_.]*[A-Za-z0-9_])?)/g;
+
+// @handles in descriptions are Instagram accounts. Linked here rather than
+// stored as markup in lib/data.ts, so the copy stays plain translatable text.
+function Description({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+
+  for (const m of text.matchAll(IG_HANDLE)) {
+    const at = m.index ?? 0;
+    if (at > cursor) parts.push(text.slice(cursor, at));
+    parts.push(
+      <a
+        key={at}
+        href={`https://www.instagram.com/${m[1]}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline decoration-foreground/40 underline-offset-2"
+      >
+        {m[0]}
+      </a>,
+    );
+    cursor = at + m[0].length;
+  }
+  parts.push(text.slice(cursor));
+
+  return <p className={className}>{parts}</p>;
+}
 
 function TimeColumn({
   startTime,
@@ -117,7 +153,10 @@ function ProgramCard({
           )}
         </div>
         {p.description && (
-          <p className="text-sm text-foreground/85">{tr(p.description)}</p>
+          <Description
+            text={tr(p.description)}
+            className="whitespace-pre-line text-sm text-foreground/85"
+          />
         )}
         {p.activityId && (
           <div className="pt-1">
@@ -126,7 +165,7 @@ function ProgramCard({
                 className="text-xs font-bold text-foreground/85"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
-                Prihlásený/á ✓
+                {t.register.registered} ✓
               </span>
             ) : (
               <div className="flex flex-wrap items-center gap-2">
@@ -136,7 +175,7 @@ function ProgramCard({
                   className="border-2 border-foreground bg-foreground px-3 py-1 text-xs font-bold text-background transition-colors hover:bg-transparent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-foreground disabled:hover:text-background"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  Zaregistrovať sa
+                  {t.register.cta}
                 </button>
                 {left !== null && (
                   <span
@@ -197,7 +236,10 @@ function LessonGroupCard({
             {t.locations[group.location]}
           </WaveChip>
         </div>
-        <p className="text-sm text-foreground/85">{tr(group.description)}</p>
+        <Description
+          text={tr(group.description)}
+          className="text-sm text-foreground/85"
+        />
 
         <div className="flex flex-wrap gap-2 pt-2">
           {slots.map((slot) => {
@@ -243,7 +285,7 @@ function LessonGroupCard({
             className="pt-1 text-xs font-bold text-foreground/85"
             style={{ fontFamily: "var(--font-barlow-condensed)" }}
           >
-            Prihlásený/á ·{" "}
+            {t.register.registered} ·{" "}
             {bookedSlots
               .map((s) => `${s.startTime}–${s.endTime}`)
               .join(", ")}
@@ -255,6 +297,7 @@ function LessonGroupCard({
 }
 
 export default function ProgramPage() {
+  const { t } = useLang();
   const [activeDay, setActiveDay] = useState<1 | 2 | 3>(1);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -321,7 +364,7 @@ export default function ProgramPage() {
         } = await supabase.auth.getSession();
         console.log("[register] session:", session);
         if (!session?.user) {
-          setError("Relácia sa nepodarila. Skús znova.");
+          setError(t.register.errors.session);
           return;
         }
         setUser(session.user);
@@ -329,7 +372,7 @@ export default function ProgramPage() {
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         console.error("[register] session error:", e);
-        setError(`Chyba: ${msg}`);
+        setError(`${t.register.errors.unexpected}: ${msg}`);
         return;
       }
     }
@@ -350,7 +393,7 @@ export default function ProgramPage() {
         .from("profiles")
         .insert({ id: user!.id, ...profileData });
       if (pe) {
-        setError("Niečo sa pokazilo. Skús znova.");
+        setError(t.register.errors.profile);
         setSubmitting(false);
         return;
       }
@@ -363,35 +406,36 @@ export default function ProgramPage() {
     );
 
     if (rpcError) {
-      setError("Registrácia zlyhala. Skús znova.");
+      setError(t.register.errors.failed);
       setSubmitting(false);
       return;
     }
 
     if (result?.error === "full") {
-      setError(
-        "Tento workshop je už plný. Ak sa niekto odhlási, budeme ťa informovať.",
-      );
+      setError(t.register.errors.full);
       setSubmitting(false);
       return;
     }
 
     if (result?.error === "already_registered") {
-      setError("Na túto aktivitu si už zaregistrovaný/á.");
+      setError(t.register.errors.alreadyRegistered);
       setSubmitting(false);
       return;
     }
 
     if (result?.error === "group_taken") {
-      setError(
-        `Už si prihlásený/á na ${GROUP_LABEL[result.group] ?? "takúto lekciu"}. Aby sa dostalo na čo najviac ľudí, môžeš mať iba jednu — najprv sa odhlás v Aktivitách.`,
-      );
+      const groups = t.register.groups;
+      const group =
+        result.group === "wave" || result.group === "skatepark"
+          ? groups[result.group as "wave" | "skatepark"]
+          : groups.fallback;
+      setError(t.register.errors.groupTaken.replace("{group}", group));
       setSubmitting(false);
       return;
     }
 
     if (result?.error) {
-      setError("Registrácia zlyhala. Skús znova.");
+      setError(t.register.errors.failed);
       setSubmitting(false);
       return;
     }
@@ -425,20 +469,33 @@ export default function ProgramPage() {
             Meet your people
           </h1>
           <div className="flex items-center justify-center gap-2">
-            <Image
-              src="/dino_black.svg"
-              alt="Level Trevel"
-              width={32}
-              height={19}
-              aria-hidden
-            />
+            <a
+              href={LEVEL_TREVEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex"
+            >
+              <Image
+                src="/dino_black.svg"
+                alt="Level Trevel"
+                width={32}
+                height={19}
+              />
+            </a>
             <span className="select-none text-sm text-foreground/80">×</span>
-            <Image
-              src="/kamposlovensku.png"
-              alt="KamPoSlovensku"
-              width={44}
-              height={45}
-            />
+            <a
+              href={KAMPOSLOVENSKU_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex"
+            >
+              <Image
+                src="/kamposlovensku.png"
+                alt="KamPoSlovensku"
+                width={44}
+                height={45}
+              />
+            </a>
           </div>
         </div>
 
@@ -488,7 +545,7 @@ export default function ProgramPage() {
                   className="mb-1 text-xs font-bold uppercase tracking-wide text-foreground/85"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  Registrácia
+                  {t.register.heading}
                 </p>
                 <h3
                   className="mb-1 text-xl font-bold text-foreground"
@@ -516,14 +573,14 @@ export default function ProgramPage() {
                   className="w-full border-2 border-foreground bg-foreground py-2.5 text-sm font-bold text-background transition-colors hover:bg-transparent hover:text-foreground disabled:opacity-40"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  {submitting ? "Registrujem..." : "Potvrdiť"}
+                  {submitting ? t.register.submitting : t.register.confirm}
                 </button>
                 <button
                   onClick={() => setModal(null)}
                   className="mt-2 w-full py-2 text-sm text-foreground/80"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  Zrušiť
+                  {t.register.cancel}
                 </button>
               </>
             ) : (
@@ -532,19 +589,19 @@ export default function ProgramPage() {
                   className="mb-1 text-xs font-bold uppercase tracking-wide text-foreground/85"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  Registrácia na {modal.activityName}
+                  {t.register.headingFor} {modal.activityName}
                 </p>
                 <h3
                   className="mb-1 text-xl font-bold text-foreground"
                   style={{ fontFamily: "var(--font-alfa)" }}
                 >
-                  Kto si?
+                  {t.register.whoAreYou}
                 </h3>
                 <p
                   className="mb-4 text-sm text-foreground/80"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  Tvoje meno bude použité pri registrácii na workshopy a lekcie.
+                  {t.register.nameNote}
                 </p>
                 <div className="mb-3 space-y-2">
                   <input
@@ -553,7 +610,7 @@ export default function ProgramPage() {
                     onChange={(e) =>
                       setNameForm((f) => ({ ...f, first_name: e.target.value }))
                     }
-                    placeholder="Meno"
+                    placeholder={t.register.firstName}
                     className="w-full border-2 border-foreground bg-transparent px-3 py-2 text-foreground outline-none focus:bg-background"
                     style={{ fontFamily: "var(--font-barlow-condensed)" }}
                   />
@@ -563,7 +620,7 @@ export default function ProgramPage() {
                     onChange={(e) =>
                       setNameForm((f) => ({ ...f, last_name: e.target.value }))
                     }
-                    placeholder="Priezvisko"
+                    placeholder={t.register.lastName}
                     className="w-full border-2 border-foreground bg-transparent px-3 py-2 text-foreground outline-none focus:bg-background"
                     style={{ fontFamily: "var(--font-barlow-condensed)" }}
                   />
@@ -586,14 +643,14 @@ export default function ProgramPage() {
                   className="w-full border-2 border-foreground bg-foreground py-2.5 text-sm font-bold text-background transition-colors hover:bg-transparent hover:text-foreground disabled:opacity-40"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  {submitting ? "Registrujem..." : "Zaregistrovať sa"}
+                  {submitting ? t.register.submitting : t.register.cta}
                 </button>
                 <button
                   onClick={() => setModal(null)}
                   className="mt-2 w-full py-2 text-sm text-foreground/80"
                   style={{ fontFamily: "var(--font-barlow-condensed)" }}
                 >
-                  Zrušiť
+                  {t.register.cancel}
                 </button>
               </>
             )}

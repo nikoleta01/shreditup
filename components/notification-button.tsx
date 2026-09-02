@@ -22,6 +22,7 @@ export function NotificationButton() {
 
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- feature detection and storage read are client-only, after mount
       setSupported(true)
       setHinted(!!localStorage.getItem('notif-hinted'))
       navigator.serviceWorker

@@ -37,7 +37,7 @@ export default function VenueMap() {
         <img
           ref={imgRef}
           src={BASE_IMAGE}
-          alt="Mapa areálu festivalu"
+          alt={t.mapPage.imageAlt}
           width={BASE_IMAGE_W}
           height={BASE_IMAGE_H}
           fetchPriority="high"

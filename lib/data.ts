@@ -131,7 +131,7 @@ export const program: ProgramItem[] = [
     link: "https://www.youtube.com/watch?v=b7k0a5hYnSI&list=RDb7k0a5hYnSI&start_radio=1",
     description: {
       sk: "Radko s Peťom to naštartujú s gitarou a ďalej môže zahrať a zaspievať ktokoľvek. Ak na niečo hráš, prines si to. Vážne!",
-      en: "",
+      en: "Radko and Peťo kick it off on guitar, then anyone can play and sing. If you play something, bring it. Seriously!",
     },
   },
   {
@@ -202,7 +202,7 @@ export const program: ProgramItem[] = [
     link: "https://www.instagram.com/ervinthestagram",
     description: {
       sk: "Kultúra, gastro a ochutnávka priamo na mieste.",
-      en: "",
+      en: "Culture, food and a tasting right on the spot.",
     },
   },
   {
@@ -428,7 +428,7 @@ export const program: ProgramItem[] = [
     link: "https://www.instagram.com/dominik_raa/",
     description: {
       sk: "Dominik žije parkourom, lezením a pohybom. Prejdeš si vranu, stojku na hlave aj stojku na vystretých rukách s variáciami. Ešte si to neskúšal? Si na správnom mieste. Kapacita je 20 ľudí.",
-      en: "",
+      en: "Dominik lives for parkour, climbing and movement. You'll go through the crow, the headstand and the straight-arm handstand with variations. Never tried it? You're in the right place. Capacity is 20 people.",
     },
   },
   {
@@ -444,7 +444,7 @@ export const program: ProgramItem[] = [
     link: "https://www.instagram.com/skyup.kosice/",
     description: {
       sk: "Chalani z košického klubu Sky Up ti ukážu základy frisbee hodov aj pár kúskov, ktoré vyzerajú nemožne.",
-      en: "",
+      en: "The crew from the Košice club Sky Up will show you the basics of frisbee throws plus a few tricks that look impossible.",
     },
   },
   {
@@ -483,7 +483,7 @@ export const program: ProgramItem[] = [
     location: "meadow",
     description: {
       sk: "Peťo priniesol animal flow na Slovensko medzi prvými. Je k tomu skvelý jogín a surfer. Ide o základný workshop, zapojíš sa bez akejkoľvek prípravy.",
-      en: "",
+      en: "Peťo was among the first to bring animal flow to Slovakia. He's also a great yogi and surfer. This is a beginner workshop — you can join with no preparation at all.",
     },
     link: "https://www.instagram.com/peterjanosik/",
   },
@@ -494,6 +494,10 @@ export const program: ProgramItem[] = [
     startTime: "11:00",
     endTime: "12:00",
     location: "mainStage",
+    description: {
+      sk: "Ideálna príležitosť zistiť, koľko toho po včerajšku ešte vieš. Daj mozgu pred obedom rannú rozcvičku a príď si s nami zasúťažiť. Výhercov odmena neminie! Tešíme sa na teba! 😊 Gabi x Saška",
+      en: "The perfect chance to find out how much you still know after yesterday. Give your brain a morning warm-up before lunch and come compete with us. Winners won't leave empty-handed! We can't wait to see you! 😊 Gabi x Saška",
+    },
   },
   {
     id: "creative-workshop",
@@ -503,8 +507,10 @@ export const program: ProgramItem[] = [
     endTime: "15:00",
     location: "mainStage",
     description: {
-      sk: "Štyri stanovištia: linotlač od @zuzajda_liska (dones si tričko alebo čokoľvek, čo chceš upgradnúť, zvyšok máme), upcyklácia oblečenia od @dorota.cicatko, korálkovanie od @zuz_anna.k náramky od @agallovaa a výroba náramkov háčikovaním pod vedením @martin_zbojan z @recykloo a výroba keramiky z rýchlotvrdnúcej hliny.",
-      en: "",
+      // The only description with hard line breaks; the <p> in app/program/page.tsx
+      // is whitespace-pre-line, so these render as four station lines.
+      sk: "Môžete sa tešit na štyri stanovištia:\n· linotlač od @zuzajda_liska (dones si tričko alebo čokoľvek, čo chceš upgradnúť, zvyšok máme)\n· upcyklácia oblečenia od @dorota.cicatko\n· korálkovanie od @zuz_anna.k, náramky od @agallovaa\n·výroba náramkov háčikovaním pod vedením @martin_zbojan z @recykloo, výroba keramiky z rýchlotvrdnúcej hliny",
+      en: "Four stations:\n· lino printing with @zuzajda_liska (bring a t-shirt or anything you want to upgrade, we've got the rest)\n· clothing upcycling with @dorota.cicatko\n· beading with @zuz_anna.k, bracelets with @agallovaa\n·crochet bracelets led by @martin_zbojan from @recykloo and pottery from air-dry clay",
     },
   },
   {
@@ -516,7 +522,7 @@ export const program: ProgramItem[] = [
     location: "skateWave",
     activityId: "88d4ad43-38b2-4127-88e1-2cb585ad511b",
     description: {
-      en: "",
+      en: "30 seconds on the wave, two runs, prizes from the festival partners. For beginners and advanced riders alike!",
       sk: "30 sekúnd na vlne, dva pokusy, ceny od partnerov festivalu. Pre začiatočníkov aj pokročilých!",
     },
   },
@@ -532,7 +538,7 @@ export const program: ProgramItem[] = [
     location: "mainStage",
     description: {
       sk: "Niekoľkonásobná majsterka sveta vo wakeskatingu. Ako sa k tomu športu dostala a čo obnáša byť profi športovkyňou na Slovensku.",
-      en: "",
+      en: "A multiple wakeskating world champion. How she got into the sport and what it takes to be a pro athlete in Slovakia.",
     },
     link: "https://www.instagram.com/zuzanavrablova/",
   },
@@ -549,7 +555,7 @@ export const program: ProgramItem[] = [
     link: "https://www.instagram.com/thebacis/",
     description: {
       sk: "Kto ešte Baču nepozná, spozná ho rýchlo. O cestovaní, surfovaní a o 'haraburdách'",
-      en: "",
+      en: "If you don't know Bača yet, you soon will. On travelling, surfing and 'junk'.",
     },
   },
   {
