@@ -131,11 +131,6 @@ export default function RegistrationPage() {
                   <span className="text-foreground">{t.locations[item.location]}</span>
                 )}
               </div>
-              {item.description && (
-                <p className="mb-4 text-sm text-foreground/70" style={{ fontFamily: "var(--font-barlow-condensed)" }}>
-                  {tr(item.description)}
-                </p>
-              )}
               <button
                 disabled={unregistering === id}
                 onClick={() => handleUnregister(id)}

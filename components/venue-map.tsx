@@ -14,7 +14,7 @@ const PARKING_SHORT: Partial<Record<PoiTypeId, string>> = {
 };
 
 export default function VenueMap() {
-  const { tr } = useLang();
+  const { t, tr } = useLang();
   const [selected, setSelected] = useState<PoiTypeId | null>(null);
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -95,7 +95,7 @@ export default function VenueMap() {
         </div>
       </div>
 
-      <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 pb-4">
+      <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2">
         {[...new Set(MAP_POIS.map((p) => p.type))].map((type) => {
           const t = POI_TYPE_BY_ID[type];
           if (!t) return null;
@@ -127,6 +127,17 @@ export default function VenueMap() {
           );
         })}
       </ul>
+
+      <p
+        className="mt-4 flex items-start gap-2 border-l-2 pl-2 pb-4 text-sm"
+        style={{
+          borderColor: "var(--chip-football)",
+          color: "color-mix(in srgb, var(--foreground) 75%, transparent)",
+        }}
+      >
+        <span aria-hidden>⚽</span>
+        {t.mapNote}
+      </p>
     </div>
   );
 }

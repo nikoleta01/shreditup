@@ -92,14 +92,14 @@
   --chip-foreground:     #ffffff;
   --chip-mainstage:            var(--pink);
   --chip-mainstage-foreground: #000000;
-  --chip-campfire:            #c93d26;
-  --chip-campfire-foreground: #ffffff;
   --chip-meadow:            var(--olive);
   --chip-meadow-foreground: #ffffff;
   --chip-skatewave:            #0ea5e9;
   --chip-skatewave-foreground: #000000;
   --chip-skatepark:            #7c3aed;
   --chip-skatepark-foreground: #ffffff;
+  --chip-football:            #059669;
+  --chip-football-foreground: #ffffff;
   --chip-volleyball:            #ca8a04;
   --chip-volleyball-foreground: #ffffff;
   --muted:              var(--surface-tint);

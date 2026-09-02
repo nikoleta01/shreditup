@@ -3,11 +3,11 @@ import type { LocationKey } from "@/lib/data";
 export type ChipTone =
   | "default"
   | "mainStage"
-  | "campfire"
   | "meadow"
   | "skateWave"
   | "skatepark"
-  | "volleyball";
+  | "volleyball"
+  | "football";
 
 // Single source of truth for chip colours. Both the location chips (WaveChip)
 // and the timetable blocks read from here, so a location can never end up a
@@ -20,10 +20,6 @@ export const CHIP_TONE: Record<
   mainStage: {
     backgroundColor: "var(--chip-mainstage)",
     color: "var(--chip-mainstage-foreground)",
-  },
-  campfire: {
-    backgroundColor: "var(--chip-campfire)",
-    color: "var(--chip-campfire-foreground)",
   },
   meadow: {
     backgroundColor: "var(--chip-meadow)",
@@ -41,17 +37,21 @@ export const CHIP_TONE: Record<
     backgroundColor: "var(--chip-volleyball)",
     color: "var(--chip-volleyball-foreground)",
   },
+  football: {
+    backgroundColor: "var(--chip-football)",
+    color: "var(--chip-football-foreground)",
+  },
 };
 
 // Locations with their own colour; everything else (incl. mainStage and
 // events without a location) falls back to "default".
 const LOCATION_TONE: Partial<Record<LocationKey, ChipTone>> = {
   mainStage: "mainStage",
-  campfire: "campfire",
   meadow: "meadow",
   skateWave: "skateWave",
   skatepark: "skatepark",
   volleyball: "volleyball",
+  football: "football",
 };
 
 export function toneForLocation(location?: LocationKey): ChipTone {

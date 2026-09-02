@@ -3,8 +3,9 @@
 import { useLang } from "@/components/language-provider";
 
 const EMERGENCY_CONTACTS = [
-  { name: "Naďka", phone: "—" },
-  { name: "Roman", phone: "—" },
+  { name: "Naďka", phone: "+421 914 214 706" },
+  { name: "Roman", phone: "+421 904 036 074" },
+  { name: "Rasťo", phone: "+421 950 384 269" },
 ];
 
 const REGISTRATION_CONTACTS = [
@@ -74,21 +75,6 @@ export default function InfoPage() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="border-2 border-foreground/20 p-4">
-        <h2
-          className="mb-2 text-lg font-bold text-foreground"
-          style={{ fontFamily: "var(--font-barlow-condensed)" }}
-        >
-          {t.infoPage.partners}
-        </h2>
-        <p
-          className="text-sm text-foreground/50"
-          style={{ fontFamily: "var(--font-barlow-condensed)" }}
-        >
-          {t.infoPage.partnersSoon}
-        </p>
       </section>
     </div>
   );

@@ -38,6 +38,15 @@ export function NotificationButton() {
       setHinted(true)
     }
     const next = !subscribed
+
+    if (next && 'Notification' in window && Notification.permission === 'denied') {
+      // Once denied, no browser lets JS re-trigger the OS prompt — subscribe()
+      // would just throw a cryptic NotAllowedError. Skip straight to telling
+      // the user where to actually fix it.
+      setErr(t.notifications.denied)
+      return
+    }
+
     setSubscribed(next)
     try {
       const reg = await navigator.serviceWorker.ready
