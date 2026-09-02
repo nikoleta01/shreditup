@@ -18,11 +18,12 @@ export const translations = {
     locations: {
       mainStage: "Hlavný stage",
       skatepark: "Skatepark",
-      campfire: "Ohnisko",
-      meadow: "Festivalová Lúka",
+      meadow: "Festivalová lúka",
       skateWave: "Skate vlna",
       volleyball: "Volejbalové ihrisko",
+      football: "Futbalové ihrisko",
     } satisfies Record<LocationKey, string>,
+    mapNote: "15:00–16:30 je futbalové ihrisko obsadené.",
     install: {
       title: "Pridaj na plochu",
       desc: "Rýchly prístup k programu festivalu bez prehliadača.",
@@ -38,6 +39,7 @@ export const translations = {
       enable: "Zapnúť notifikácie",
       disable: "Vypnúť notifikácie",
       notSupported: "Notifikácie nie sú podporované.",
+      denied: "Notifikácie sú zablokované. Povoľ ich v Nastavenia → Notifikácie → Shreditup.",
     },
     notifyBefore: "O 30 minút začína",
     full: "PLNÉ",
@@ -45,8 +47,6 @@ export const translations = {
     infoPage: {
       emergency: "Núdzové kontakty",
       registrationNote: "Pre registráciu po 19:00 volaj",
-      partners: "Partneri",
-      partnersSoon: "Čoskoro pridáme.",
     },
   },
   en: {
@@ -64,11 +64,12 @@ export const translations = {
     locations: {
       mainStage: "Main Stage",
       skatepark: "Skatepark",
-      campfire: "Campfire",
       meadow: "Festival Meadow",
       skateWave: "Skate Wave",
       volleyball: "Volleyball",
+      football: "Football pitch",
     } satisfies Record<LocationKey, string>,
+    mapNote: "The football pitch is occupied 15:00–16:30.",
     install: {
       title: "Add to Home Screen",
       desc: "Quick access to the festival program without a browser.",
@@ -84,6 +85,7 @@ export const translations = {
       enable: "Enable notifications",
       disable: "Disable notifications",
       notSupported: "Notifications not supported.",
+      denied: "Notifications are blocked. Enable them in Settings → Notifications → Shreditup.",
     },
     notifyBefore: "Starting in 30 minutes",
     full: "FULL",
@@ -91,8 +93,6 @@ export const translations = {
     infoPage: {
       emergency: "Emergency contacts",
       registrationNote: "For registration after 19:00 call",
-      partners: "Partners",
-      partnersSoon: "Coming soon.",
     },
   },
 } satisfies Record<Lang, unknown>;

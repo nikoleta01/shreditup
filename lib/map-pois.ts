@@ -1,3 +1,18 @@
+import type { LocationKey } from "@/lib/data";
+import { translations } from "@/lib/i18n";
+import { CHIP_TONE, type ChipTone } from "@/lib/location-chip";
+
+// A pin that is also a program location takes its colour and its label from the
+// chip tokens and i18n, so a location can't be one colour on the timetable and
+// another on the map.
+function fromProgram(location: LocationKey & ChipTone) {
+  return {
+    color: CHIP_TONE[location].backgroundColor,
+    sk: translations.sk.locations[location],
+    en: translations.en.locations[location],
+  };
+}
+
 // POI = Point Of Interest
 export type PoiTypeId =
   | "registration"
@@ -5,12 +20,13 @@ export type PoiTypeId =
   | "skateWave"
   | "tents"
   | "meadow"
+  | "chillZone"
   | "restaurant"
   | "foodTruck"
   | "toilets"
   | "showers"
-  | "campfire"
   | "volleyball"
+  | "football"
   | "parkingP2"
   | "parkingLong";
 
@@ -32,22 +48,8 @@ export const POI_TYPES: PoiType[] = [
     en: "Registration",
     color: "#2b2117",
   },
-  {
-    id: "mainStage",
-    emoji: "🎤",
-    sk: "Hlavný stage",
-    en: "Main stage",
-    color: "#d77ea6",
-    scale: 1.25,
-  },
-  {
-    id: "skateWave",
-    emoji: "🛹",
-    sk: "Skate vlna",
-    en: "Skate wave",
-    color: "#0ea5e9",
-    scale: 1.25,
-  },
+  { id: "mainStage", emoji: "🎤", scale: 1.25, ...fromProgram("mainStage") },
+  { id: "skateWave", emoji: "🛹", scale: 1.25, ...fromProgram("skateWave") },
   {
     id: "tents",
     emoji: "⛺",
@@ -55,12 +57,14 @@ export const POI_TYPES: PoiType[] = [
     en: "Tent area",
     color: "#0891b2",
   },
+  { id: "meadow", emoji: "🧘", ...fromProgram("meadow") },
   {
-    id: "meadow",
-    emoji: "🧘",
-    sk: "Festivalová lúka",
-    en: "Festival meadow",
-    color: "#db2777",
+    id: "chillZone",
+    emoji: "😎",
+    sk: "Chill zóna",
+    en: "Chill zone",
+    color: "#1d4ed8",
+    scale: 1.25,
   },
   {
     id: "restaurant",
@@ -72,9 +76,10 @@ export const POI_TYPES: PoiType[] = [
   {
     id: "foodTruck",
     emoji: "🍟",
-    sk: "Food truck",
-    en: "Food truck",
+    sk: "Food trucky",
+    en: "Food trucks",
     color: "#d97706",
+    scale: 1.25,
   },
   {
     id: "toilets",
@@ -83,21 +88,9 @@ export const POI_TYPES: PoiType[] = [
     en: "Toilets",
     color: "#475569",
   },
-  { id: "showers", emoji: "🚿", sk: "Sprchy", en: "Showers", color: "#0d9488" },
-  {
-    id: "campfire",
-    emoji: "🔥",
-    sk: "Ohnisko",
-    en: "Campfire",
-    color: "#e11d48",
-  },
-  {
-    id: "volleyball",
-    emoji: "🏐",
-    sk: "Volejbal",
-    en: "Volleyball",
-    color: "#ca8a04",
-  },
+  { id: "showers", emoji: "🚿", sk: "Sprchy", en: "Showers", color: "#94a3b8" },
+  { id: "volleyball", emoji: "🏐", ...fromProgram("volleyball") },
+  { id: "football", emoji: "⚽", ...fromProgram("football") },
   {
     id: "parkingP2",
     emoji: "🅿️",
@@ -134,11 +127,14 @@ export const MAP_POIS: MapPoi[] = [
   { type: "tents", x: 30.58, y: 86.99 },
   { type: "meadow", x: 33.48, y: 62 },
   { type: "restaurant", x: 53.79, y: 17.27 },
-  { type: "foodTruck", x: 45.98, y: 33.01 },
+  { type: "foodTruck", x: 24.44, y: 39.02 },
   { type: "toilets", x: 43.08, y: 13.57 },
   { type: "showers", x: 37.28, y: 14.5 },
-  { type: "campfire", x: 18, y: 38.56 },
   { type: "volleyball", x: 53.57, y: 86.06 },
   { type: "parkingP2", x: 57.8, y: 4.2 },
   { type: "parkingLong", x: 70.98, y: 52.75 },
+  { type: "toilets", x: 44.2, y: 84.83 },
+  { type: "parkingLong", x: 70.76, y: 40.41 },
+  { type: "chillZone", x: 47.1, y: 39.79 },
+  { type: "football", x: 20.98, y: 22.83 },
 ];

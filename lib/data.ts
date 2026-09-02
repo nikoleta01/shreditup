@@ -2,9 +2,9 @@
 // resolved per language via `t.locations[key]` in i18n.ts.
 export type LocationKey =
   | "volleyball"
+  | "football"
   | "mainStage"
   | "skatepark"
-  | "campfire"
   | "meadow"
   | "skateWave";
 
@@ -133,14 +133,6 @@ export const program: ProgramItem[] = [
       sk: "Radko s Peťom to naštartujú s gitarou a ďalej môže zahrať a zaspievať ktokoľvek. Ak na niečo hráš, prines si to. Vážne!",
       en: "",
     },
-  },
-  {
-    id: "campfire",
-    title: { sk: "Vatra", en: "Bonfire" },
-    day: 1,
-    startTime: "21:00",
-    endTime: "22:30",
-    location: "campfire",
   },
   {
     id: "robson",
@@ -448,7 +440,7 @@ export const program: ProgramItem[] = [
     day: 2,
     startTime: "11:00",
     endTime: "12:00",
-    location: "meadow",
+    location: "football",
     link: "https://www.instagram.com/skyup.kosice/",
     description: {
       sk: "Chalani z košického klubu Sky Up ti ukážu základy frisbee hodov aj pár kúskov, ktoré vyzerajú nemožne.",
@@ -464,7 +456,7 @@ export const program: ProgramItem[] = [
     day: 2,
     startTime: "14:00",
     endTime: "15:00",
-    location: "meadow",
+    location: "football",
     link: "https://www.instagram.com/skyup.kosice/",
   },
   {
@@ -497,7 +489,7 @@ export const program: ProgramItem[] = [
   },
   {
     id: "quiz",
-    title: { sk: "Level Trevel Kvíz", en: "Level Trevel Quiz" },
+    title: { sk: "Kvíz", en: "Quiz" },
     day: 2,
     startTime: "11:00",
     endTime: "12:00",
