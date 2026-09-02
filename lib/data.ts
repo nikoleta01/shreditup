@@ -509,8 +509,8 @@ export const program: ProgramItem[] = [
     description: {
       // The only description with hard line breaks; the <p> in app/program/page.tsx
       // is whitespace-pre-line, so these render as four station lines.
-      sk: "Môžete sa tešit na štyri stanovištia:\n· linotlač od @zuzajda_liska (dones si tričko alebo čokoľvek, čo chceš upgradnúť, zvyšok máme)\n· upcyklácia oblečenia od @dorota.cicatko\n· korálkovanie od @zuz_anna.k, náramky od @agallovaa\n·výroba náramkov háčikovaním pod vedením @martin_zbojan z @recykloo, výroba keramiky z rýchlotvrdnúcej hliny",
-      en: "Four stations:\n· lino printing with @zuzajda_liska (bring a t-shirt or anything you want to upgrade, we've got the rest)\n· clothing upcycling with @dorota.cicatko\n· beading with @zuz_anna.k, bracelets with @agallovaa\n·crochet bracelets led by @martin_zbojan from @recykloo and pottery from air-dry clay",
+      sk: "Môžete sa tešiť na SWAP oblečenia a k tomu štyri stanovištia:\n· linotlač od @zuzajda_liska (dones si tričko alebo čokoľvek, čo chceš upgradnúť, zvyšok máme)\n· upcyklácia oblečenia od @dorota.cicatko\n· korálkovanie od @zuz_anna.k, náramky od @agallovaa\n· výroba náramkov háčikovaním pod vedením @martin_zbojan z @recykloo, výroba keramiky z rýchlotvrdnúcej hliny",
+      en: "You can look forward to a clothes SWAP, plus four stations:\n· lino printing with @zuzajda_liska (bring a t-shirt or anything you want to upgrade, we've got the rest)\n· clothing upcycling with @dorota.cicatko\n· beading with @zuz_anna.k, bracelets with @agallovaa\n· crochet bracelets led by @martin_zbojan from @recykloo and pottery from air-dry clay",
     },
   },
   {
