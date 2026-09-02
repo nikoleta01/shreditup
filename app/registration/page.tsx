@@ -50,7 +50,7 @@ export default function RegistrationPage() {
       .eq("activity_id", activityId);
 
     if (err) {
-      setError("Odhlásenie zlyhalo. Skús znova.");
+      setError(t.myActivitiesPage.unregisterFailed);
     } else {
       setRegisteredIds((prev) => {
         const next = new Set(prev);
@@ -68,7 +68,7 @@ export default function RegistrationPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <span className="text-sm text-foreground/50" style={{ fontFamily: "var(--font-barlow-condensed)" }}>
-          Načítavam...
+          {t.loading}
         </span>
       </div>
     );
@@ -87,13 +87,15 @@ export default function RegistrationPage() {
         className="mb-1 text-center text-4xl leading-tight text-foreground"
         style={{ fontFamily: "var(--font-geoparody)" }}
       >
-        Moje aktivity
+        {t.myActivitiesPage.title}
       </h1>
       <p
         className="mb-6 text-center text-sm text-foreground/60"
         style={{ fontFamily: "var(--font-barlow-condensed)" }}
       >
-        {profile ? `${profile.first_name} ${profile.last_name}` : "Tvoje registrácie na festivale"}
+        {profile
+          ? `${profile.first_name} ${profile.last_name}`
+          : t.myActivitiesPage.subtitle}
       </p>
 
       {error && (
@@ -105,10 +107,10 @@ export default function RegistrationPage() {
       {myActivities.length === 0 ? (
         <div className="border-2 border-foreground/20 p-6 text-center">
           <p className="text-sm text-foreground/50" style={{ fontFamily: "var(--font-barlow-condensed)" }}>
-            Zatiaľ nie si prihlásený/á na žiadnu aktivitu.
+            {t.myActivitiesPage.empty}
           </p>
           <p className="mt-1 text-xs text-foreground/30" style={{ fontFamily: "var(--font-barlow-condensed)" }}>
-            Registráciu nájdeš v sekcii Program.
+            {t.myActivitiesPage.emptyHint}
           </p>
         </div>
       ) : (
@@ -137,7 +139,9 @@ export default function RegistrationPage() {
                 className="border-2 border-foreground px-4 py-1.5 text-xs font-bold text-foreground transition-colors hover:bg-foreground hover:text-background disabled:opacity-40"
                 style={{ fontFamily: "var(--font-barlow-condensed)" }}
               >
-                {unregistering === id ? "Odhlasujem..." : "Odhlásiť sa"}
+                {unregistering === id
+                  ? t.myActivitiesPage.unregistering
+                  : t.myActivitiesPage.unregister}
               </button>
             </div>
           ))}
