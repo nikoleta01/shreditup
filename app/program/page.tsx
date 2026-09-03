@@ -587,14 +587,16 @@ export default function ProgramPage() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal. z-[60], not z-50: BottomNav is also z-50 and renders after
+          <main>, so an equal z-index let it paint over the sheet and swallow
+          taps on the bottom of the register button. */}
       {modal && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]"
           onClick={() => setModal(null)}
         >
           <div
-            className="w-full max-w-md border-2 border-foreground bg-card p-6"
+            className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto border-2 border-foreground bg-card p-6"
             onClick={(e) => e.stopPropagation()}
           >
             {modal.type === "confirm" && profile ? (
