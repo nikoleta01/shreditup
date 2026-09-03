@@ -398,7 +398,25 @@ export default function ProgramPage() {
     init();
   }, []);
 
-  async function handleRegisterTap(activityId: string, activityName: string) {
+  // Deliberately synchronous. Signing in here meant the sheet only appeared
+  // after a network round trip, with nothing on screen to say why — and if the
+  // sign-in failed we set an error that renders *inside* the modal we never
+  // opened, so the button silently did nothing. The session is only needed to
+  // write, so it is established in submitRegistration instead, behind the
+  // spinner the user gets by pressing the button.
+  function handleRegisterTap(activityId: string, activityName: string) {
+    setError(null);
+    setModal({
+      type: profile ? "confirm" : "name-form",
+      activityId,
+      activityName,
+    });
+  }
+
+  async function submitRegistration(activityId: string, profileData: Profile) {
+    setSubmitting(true);
+    setError(null);
+
     let currentUser = user;
     if (!currentUser) {
       try {
@@ -406,32 +424,22 @@ export default function ProgramPage() {
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        console.log("[register] session:", session);
         if (!session?.user) {
           setError(t.register.errors.session);
+          setSubmitting(false);
           return;
         }
         setUser(session.user);
         currentUser = session.user;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
-        console.error("[register] session error:", e);
         setError(`${t.register.errors.unexpected}: ${msg}`);
+        setSubmitting(false);
         return;
       }
     }
-    if (profile) {
-      setModal({ type: "confirm", activityId, activityName });
-    } else {
-      setModal({ type: "name-form", activityId, activityName });
-    }
-  }
 
-  async function submitRegistration(activityId: string, profileData: Profile) {
-    setSubmitting(true);
-    setError(null);
-
-    let outcome = await writeRegistration(user!.id, !profile, activityId, profileData);
+    let outcome = await writeRegistration(currentUser.id, !profile, activityId, profileData);
 
     // Both writes hang off the profiles → auth.users FK, so a violation means
     // this session's user no longer exists: the account was wiped, or the tab
