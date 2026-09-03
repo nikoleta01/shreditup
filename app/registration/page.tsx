@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabase } from "@/lib/supabase";
+import { getLiveSession, getSupabase } from "@/lib/supabase";
 import { useLang } from "@/components/language-provider";
 import { getRegisterableActivity, type ProgramItem } from "@/lib/data";
 
@@ -21,8 +21,7 @@ export default function RegistrationPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase();
-      const { data: { session } } = await supabase.auth.getSession();
+      const { supabase, session } = await getLiveSession();
       if (!session) { setLoading(false); return; }
       setUserId(session.user.id);
 

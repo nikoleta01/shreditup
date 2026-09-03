@@ -154,7 +154,7 @@ export const program: ProgramItem[] = [
     day: 2,
     startTime: "09:00",
     endTime: "10:00",
-    location: "meadow",
+    location: "football",
     link: "https://www.instagram.com/jana_siskova/",
     description: {
       sk: "Janku už môžete poznať z našich Level Trevel hodín jógy v Sade Janka Kráľa. Pripravili sme pre Vás 2 varianty, pre začiatočníkov, neskôr pre mierne pokročilých. Kapacita neobmedzená, dones si len podložku.",
@@ -186,7 +186,7 @@ export const program: ProgramItem[] = [
     day: 2,
     startTime: "10:00",
     endTime: "11:00",
-    location: "meadow",
+    location: "football",
     link: "https://www.instagram.com/jana_siskova/",
   },
   {
@@ -480,7 +480,7 @@ export const program: ProgramItem[] = [
     day: 2,
     startTime: "17:00",
     endTime: "19:30",
-    location: "meadow",
+    location: "football",
     description: {
       sk: "Peťo priniesol animal flow na Slovensko medzi prvými. Je k tomu skvelý jogín a surfer. Ide o základný workshop, zapojíš sa bez akejkoľvek prípravy.",
       en: "Peťo was among the first to bring animal flow to Slovakia. He's also a great yogi and surfer. This is a beginner workshop — you can join with no preparation at all.",

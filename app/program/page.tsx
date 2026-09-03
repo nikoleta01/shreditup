@@ -14,7 +14,12 @@ import { DayTabs } from "@/components/day-tabs";
 import { WaveChip } from "@/components/wave-chip";
 import { toneForLocation } from "@/lib/location-chip";
 import { ProgramTitle } from "@/components/program-title";
-import { ensureAnonymousSession, getSupabase } from "@/lib/supabase";
+import {
+  ensureAnonymousSession,
+  getLiveSession,
+  getSupabase,
+  reauthenticateAnonymously,
+} from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
 const SKATE_WAVE_URL = "https://www.kokopeli.sk/";
@@ -296,6 +301,47 @@ function LessonGroupCard({
   );
 }
 
+const FK_VIOLATION = "23503";
+
+type RegisterResult = { error?: string; group?: string };
+
+type WriteOutcome =
+  | { kind: "ok" }
+  | { kind: "dead-user" }
+  | { kind: "profile-failed" }
+  | { kind: "rpc-failed" }
+  | { kind: "rejected"; result: RegisterResult };
+
+async function writeRegistration(
+  userId: string,
+  needsProfile: boolean,
+  activityId: string,
+  profileData: Profile,
+): Promise<WriteOutcome> {
+  const supabase = getSupabase();
+
+  if (needsProfile) {
+    const { error } = await supabase
+      .from("profiles")
+      .insert({ id: userId, ...profileData });
+    if (error) {
+      return { kind: error.code === FK_VIOLATION ? "dead-user" : "profile-failed" };
+    }
+  }
+
+  const { data: result, error } = await supabase.rpc("register_for_activity", {
+    p_activity_id: activityId,
+  });
+
+  // register_for_activity() only traps unique_violation, so a missing profile
+  // row surfaces here as the raw SQLSTATE rather than a handled result.error.
+  if (error) {
+    return { kind: error.code === FK_VIOLATION ? "dead-user" : "rpc-failed" };
+  }
+
+  return result?.error ? { kind: "rejected", result } : { kind: "ok" };
+}
+
 export default function ProgramPage() {
   const { t } = useLang();
   const [activeDay, setActiveDay] = useState<1 | 2 | 3>(1);
@@ -326,9 +372,7 @@ export default function ProgramPage() {
         ),
       );
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { session } = await getLiveSession();
       if (!session) return; // no session yet — wait until register tap
       setUser(session.user);
 
@@ -386,26 +430,40 @@ export default function ProgramPage() {
   async function submitRegistration(activityId: string, profileData: Profile) {
     setSubmitting(true);
     setError(null);
-    const supabase = getSupabase();
 
-    if (!profile) {
-      const { error: pe } = await supabase
-        .from("profiles")
-        .insert({ id: user!.id, ...profileData });
-      if (pe) {
-        setError(t.register.errors.profile);
+    let outcome = await writeRegistration(user!.id, !profile, activityId, profileData);
+
+    // Both writes hang off the profiles → auth.users FK, so a violation means
+    // this session's user no longer exists: the account was wiped, or the tab
+    // sat open across a wipe. Sign in again and redo the pair — a fresh
+    // anonymous account has no profile row, so that one goes in too.
+    if (outcome.kind === "dead-user") {
+      const fresh = await reauthenticateAnonymously().catch(() => null);
+      if (!fresh) {
+        setError(t.register.errors.session);
         setSubmitting(false);
         return;
       }
-      setProfile(profileData);
+      setUser(fresh);
+      setProfile(null);
+      setRegisteredIds(new Set());
+      outcome = await writeRegistration(fresh.id, true, activityId, profileData);
     }
 
-    const { data: result, error: rpcError } = await supabase.rpc(
-      "register_for_activity",
-      { p_activity_id: activityId },
-    );
+    if (outcome.kind === "profile-failed" || outcome.kind === "dead-user") {
+      setError(t.register.errors.profile);
+      setSubmitting(false);
+      return;
+    }
 
-    if (rpcError) {
+    // Past the profile stage the row exists whatever the registration did, so
+    // remember it — otherwise a second tap after a rejected registration would
+    // show the name form again and re-insert.
+    setProfile(profileData);
+
+    const result = outcome.kind === "rejected" ? outcome.result : null;
+
+    if (outcome.kind === "rpc-failed") {
       setError(t.register.errors.failed);
       setSubmitting(false);
       return;
