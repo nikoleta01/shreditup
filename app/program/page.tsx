@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import Image from "next/image";
+import { TriangleAlert } from "lucide-react";
 import {
   formatTime,
   getProgramEntriesByDay,
@@ -297,6 +303,58 @@ function LessonGroupCard({
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+// Only shown outside the installed PWA. The notice is about *this browser*
+// holding the booking, which is precisely what a home-screen install avoids —
+// so showing it inside the installed app would be noise. Defaults to hidden so
+// it never flashes for PWA users, and a failed detection errs towards showing
+// a harmless warning rather than hiding a needed one.
+const STANDALONE_QUERY = "(display-mode: standalone)";
+
+function subscribeToDisplayMode(onChange: () => void) {
+  const mq = window.matchMedia(STANDALONE_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function isStandalone() {
+  return (
+    window.matchMedia(STANDALONE_QUERY).matches ||
+    // iOS Safari predates display-mode and reports its own flag.
+    ("standalone" in navigator && navigator.standalone === true)
+  );
+}
+
+function DeviceWarning() {
+  const { t } = useLang();
+  // The server snapshot claims "installed" so the prerendered HTML carries no
+  // warning; the real value arrives on hydration.
+  const standalone = useSyncExternalStore(
+    subscribeToDisplayMode,
+    isStandalone,
+    () => true,
+  );
+
+  if (standalone) return null;
+
+  return (
+    <div className="mb-4 border-2 border-foreground bg-warning p-3">
+      <p
+        className="mb-0.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-foreground"
+        style={{ fontFamily: "var(--font-barlow-condensed)" }}
+      >
+        <TriangleAlert className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
+        {t.register.deviceWarningTitle}
+      </p>
+      <p
+        className="text-sm leading-snug text-foreground"
+        style={{ fontFamily: "var(--font-barlow-condensed)" }}
+      >
+        {t.register.deviceWarning}
+      </p>
     </div>
   );
 }
@@ -635,6 +693,7 @@ export default function ProgramPage() {
                     {error}
                   </p>
                 )}
+                <DeviceWarning />
                 <button
                   disabled={submitting}
                   onClick={() => submitRegistration(modal.activityId, profile)}
@@ -701,6 +760,7 @@ export default function ProgramPage() {
                     {error}
                   </p>
                 )}
+                <DeviceWarning />
                 <button
                   disabled={
                     !nameForm.first_name.trim() ||

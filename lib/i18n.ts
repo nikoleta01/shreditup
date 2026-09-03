@@ -72,6 +72,9 @@ const sk = {
     headingFor: "Registrácia na",
     whoAreYou: "Kto si?",
     nameNote: "Tvoje meno bude použité pri registrácii na workshopy a lekcie.",
+    deviceWarningTitle: "Pozor",
+    deviceWarning:
+      "Rezervácia sa uloží len do tohto prehliadača, neprenáša sa na iné zariadenie. Registruj sa na telefóne, ktorý budeš mať na festivale, aby si nezabral miesto ostatným.",
     firstName: "Meno",
     lastName: "Priezvisko",
     confirm: "Potvrdiť",
@@ -165,6 +168,9 @@ const en: typeof sk = {
     whoAreYou: "Who are you?",
     nameNote:
       "Your name will be used when registering for workshops and lessons.",
+    deviceWarningTitle: "Heads up",
+    deviceWarning:
+      "This booking is saved only to this browser, you won't see it on another device. Register on the phone you'll have at the festival, so you don't take up multiple spots.",
     firstName: "First name",
     lastName: "Last name",
     confirm: "Confirm",

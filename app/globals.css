@@ -36,6 +36,7 @@
   --color-nav-foreground: var(--nav-foreground);
   --color-nav-foreground-active: var(--nav-foreground-active);
   --color-nav: var(--nav);
+  --color-warning: var(--warning);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -60,6 +61,11 @@
      under AA. Brightening ~8% takes it to 4.98:1 while reading as the same
      colour on screen. Kept separate so the poster olive stays untouched. */
   --olive-lift: #8a8740;
+
+  /* Warning yellow. Deliberately outside the poster palette — it is used once,
+     on the blue register sheet, for the one notice a person must not skim past.
+     Ink lands ~9.9:1 on it. */
+  --warning: #f2c53d;
 
   /* Surface — "Poster Paper": the warm stock a poster is printed on.
      Ink text lands ~15.8:1 on it, the most legible surface we've had.
