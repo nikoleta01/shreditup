@@ -468,6 +468,7 @@ export const program: ProgramItem[] = [
     day: 2,
     startTime: "14:00",
     endTime: "17:00",
+    link: "https://docs.google.com/spreadsheets/d/14__Zp_RMy-S3ZEHOTO7gwjXbxfu9R9fqvmiWfPNVzSU/edit?usp=sharing",
     location: "volleyball",
     description: {
       sk: "Tretí ročník. Máš tím? Super. Nemáš? Priradíme ťa.",
