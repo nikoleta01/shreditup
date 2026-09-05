@@ -476,19 +476,6 @@ export const program: ProgramItem[] = [
     },
   },
   {
-    id: "animal-flow",
-    title: { sk: "Animal Flow s Peťom", en: "Animal Flow with Peťo" },
-    day: 2,
-    startTime: "17:00",
-    endTime: "19:30",
-    location: "football",
-    description: {
-      sk: "Peťo priniesol animal flow na Slovensko medzi prvými. Je k tomu skvelý jogín a surfer. Ide o základný workshop, zapojíš sa bez akejkoľvek prípravy.",
-      en: "Peťo was among the first to bring animal flow to Slovakia. He's also a great yogi and surfer. This is a beginner workshop — you can join with no preparation at all.",
-    },
-    link: "https://www.instagram.com/peterjanosik/",
-  },
-  {
     id: "quiz",
     title: { sk: "Kvíz", en: "Quiz" },
     day: 2,
@@ -516,7 +503,7 @@ export const program: ProgramItem[] = [
   },
   {
     id: "surfskate-competition",
-    title: { sk: "Surfskate súťaž", en: "Surfskate Competition" },
+    title: { sk: "Surfskate súťag", en: "Surfskate Competition" },
     day: 2,
     startTime: "17:00",
     endTime: "18:30",
